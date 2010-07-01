@@ -1,18 +1,18 @@
 class Mixpanel
-  attr_accessor :actions
+  attr_accessor :events
 
   def initialize(token, options = {})
     @token = token
-    @actions = []
+    @events = []
   end
 
-  def append_action(action, metadata = {})
-    @actions << build_action(action, metadata)
+  def append_event(event, properties = {})
+    @events << build_event(event, properties)
   end
 
   private
 
-  def build_action(action, metadata)
-    {:action => action, :metadata => metadata}
+  def build_event(event, properties)
+    {:event => event, :properties => properties}
   end
 end
