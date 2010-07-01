@@ -11,6 +11,25 @@ describe Mixpanel do
     end
   end
 
+  context "Accessing Mixpanel through direct request" do
+    before do
+      @mixpanel = Mixpanel.new(MIX_PANEL_TOKEN)
+    end
+
+    context "Tracking events" do
+      it "should track simple events" do
+        @mixpanel.track_event("Sign up").should == true
+      end
+
+      it "should call request method with token and time value" do
+        params = {:event => "Sign up", :properties => {:token => MIX_PANEL_TOKEN, :time => Time.now.utc.to_i}}
+
+        @mixpanel.should_receive(:request).with(params).and_return("1")
+        @mixpanel.track_event("Sign up").should == true
+      end
+    end
+  end
+
   context "Accessing Mixpanel through javascript API" do
     context "Appending events" do
       it "should append simple events" do
