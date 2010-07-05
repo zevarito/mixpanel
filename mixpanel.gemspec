@@ -1,5 +1,5 @@
 spec = Gem::Specification.new do |s|
-  s.name = "Mixpanel"
+  s.name = "mixpanel"
   s.version = "0.0.1"
   s.rubyforge_project = "mixpanel"
   s.description = "Simple lib to track events in Mixpanel service."
