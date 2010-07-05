@@ -10,7 +10,7 @@ spec = Gem::Specification.new do |s|
   s.summary = "Supports direct request api and javascript requests."
   s.files = %w[
     .gitignore
-    README
+    README.rdoc
     LICENSE
     Rakefile
     mixpanel.gemspec
@@ -20,7 +20,7 @@ spec = Gem::Specification.new do |s|
   ]
   s.require_path = "lib"
   s.has_rdoc = false
-  s.extra_rdoc_files = ["README"]
+  s.extra_rdoc_files = ["README.rdoc"]
   s.add_dependency 'json'
   s.add_development_dependency 'rspec'
   s.add_development_dependency 'fakeweb'

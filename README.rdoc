@@ -1,0 +1,25 @@
+== What is Mixpanel (the service) ?
+
+*Mixpanel* is a real-time analytics service that helps companies understand how users interact with web applications.
+http://mixpanel.com
+
+== What does this Gem?
+
+* Track events with properties directly from your backend
+
+
+== How to install?
+
+  gem install mixpanel
+
+
+== How to use?
+
+  require 'mixpanel'
+
+  mixpanel = Mixpanel.new("your_mixpanel_project_token")
+
+  mixpanel.track("Sign up", {
+    :referer => "http://example.com",
+    :ip => "4.4.4.4"
+  })
