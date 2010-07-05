@@ -3,7 +3,7 @@ require 'base64'
 require 'json'
 
 class Mixpanel
-  attr_accessor :events
+  attr_reader :events
 
   def initialize(token, options = {})
     @token = token
