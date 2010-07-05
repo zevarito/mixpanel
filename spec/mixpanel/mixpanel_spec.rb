@@ -11,11 +11,16 @@ describe Mixpanel do
     end
   end
 
-  context "Accessing Mixpanel through direct request" do
-    before do
-      @mixpanel = Mixpanel.new(MIX_PANEL_TOKEN)
+  context "Cleaning events" do
+    it "should clean the queue" do
+      @mixpanel.append_event("Sign up")
+      @mixpanel.events.size.should == 1
+      @mixpanel.clean_queue
+      @mixpanel.events.size.should == 0
     end
+  end
 
+  context "Accessing Mixpanel through direct request" do
     context "Tracking events" do
       it "should track simple events" do
         @mixpanel.track_event("Sign up").should == true

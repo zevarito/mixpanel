@@ -19,6 +19,10 @@ class Mixpanel
     parse_response request(params)
   end
 
+  def clean_queue
+    @events = []
+  end
+
   private
 
   def parse_response(response)
