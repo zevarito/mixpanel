@@ -3,15 +3,14 @@ require 'base64'
 require 'json'
 
 class Mixpanel
-  attr_reader :queue
-
-  def initialize(token, options = {})
+  def initialize(token, env)
     @token = token
-    @queue = []
+    @env = env
+    clear_queue
   end
 
   def append_event(event, properties = {})
-    @queue << build_event(event, properties)
+    queue << build_event(event, properties)
   end
 
   def track_event(event, properties = {})
@@ -19,8 +18,12 @@ class Mixpanel
     parse_response request(params)
   end
 
-  def clean_queue
-    @queue = []
+  def queue
+    @env["mixpanel_events"]
+  end
+
+  def clear_queue
+    @env["mixpanel_events"] = []
   end
 
   private

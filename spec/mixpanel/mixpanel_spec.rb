@@ -2,20 +2,20 @@ require 'spec_helper'
 
 describe Mixpanel do
   before do
-    @mixpanel = Mixpanel.new(MIX_PANEL_TOKEN)
+    @mixpanel = Mixpanel.new(MIX_PANEL_TOKEN, @env = {})
   end
 
   context "Initializing object" do
     it "should have an instance variable for token and events" do
-      @mixpanel.instance_variables.should include("@token", "@queue")
+      @mixpanel.instance_variables.should include("@token", "@env")
     end
   end
 
-  context "Cleaning queue" do
-    it "should clean the queue" do
+  context "Cleaning appended events" do
+    it "should clear the queue" do
       @mixpanel.append_event("Sign up")
       @mixpanel.queue.size.should == 1
-      @mixpanel.clean_queue
+      @mixpanel.clear_queue
       @mixpanel.queue.size.should == 0
     end
   end
@@ -37,6 +37,15 @@ describe Mixpanel do
 
   context "Accessing Mixpanel through javascript API" do
     context "Appending events" do
+      it "should store the event under the appropriate key" do
+        @mixpanel.append_event("Sign up")
+        @env.has_key?("mixpanel_events").should == true
+      end
+
+      it "should be the same the queue than env['mixpanel_events']" do
+        @env['mixpanel_events'].object_id.should == @mixpanel.queue.object_id
+      end
+
       it "should append simple events" do
         @mixpanel.append_event("Sign up")
         mixpanel_queue_should_include(@mixpanel, "Sign up", {})
