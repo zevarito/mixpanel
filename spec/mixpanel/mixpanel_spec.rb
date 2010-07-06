@@ -7,16 +7,16 @@ describe Mixpanel do
 
   context "Initializing object" do
     it "should have an instance variable for token and events" do
-      @mixpanel.instance_variables.should include("@token", "@events")
+      @mixpanel.instance_variables.should include("@token", "@queue")
     end
   end
 
-  context "Cleaning events" do
+  context "Cleaning queue" do
     it "should clean the queue" do
       @mixpanel.append_event("Sign up")
-      @mixpanel.events.size.should == 1
+      @mixpanel.queue.size.should == 1
       @mixpanel.clean_queue
-      @mixpanel.events.size.should == 0
+      @mixpanel.queue.size.should == 0
     end
   end
 
@@ -39,17 +39,17 @@ describe Mixpanel do
     context "Appending events" do
       it "should append simple events" do
         @mixpanel.append_event("Sign up")
-        mixpanel_events_should_include(@mixpanel, "Sign up", {})
+        mixpanel_queue_should_include(@mixpanel, "Sign up", {})
       end
 
       it "should append events with properties" do
         @mixpanel.append_event("Sign up", {:referer => 'http://example.com'})
-        mixpanel_events_should_include(@mixpanel, "Sign up", {:referer => 'http://example.com'})
+        mixpanel_queue_should_include(@mixpanel, "Sign up", {:referer => 'http://example.com'})
       end
 
-      it "should give direct access to events" do
+      it "should give direct access to queue" do
         @mixpanel.append_event("Sign up", {:referer => 'http://example.com'})
-        @mixpanel.events.size.should == 1
+        @mixpanel.queue.size.should == 1
       end
     end
   end

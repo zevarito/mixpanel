@@ -3,8 +3,8 @@ require 'fakeweb'
 
 MIX_PANEL_TOKEN = "e2d8b0bea559147844ffab3d607d26a6"
 
-def mixpanel_events_should_include(mixpanel, event, properties)
-  mixpanel.events.each do |event_hash|
+def mixpanel_queue_should_include(mixpanel, event, properties)
+  mixpanel.queue.each do |event_hash|
     event_hash[:event].should == event
     event_hash[:properties].should == properties if properties
   end
