@@ -1,5 +1,8 @@
 require File.join(File.dirname(__FILE__), "../lib", "mixpanel")
+require 'rack/test'
 require 'fakeweb'
+require 'nokogiri'
+Dir[File.expand_path(File.join(File.dirname(__FILE__),'support','**','*.rb'))].each {|f| require f}
 
 MIX_PANEL_TOKEN = "e2d8b0bea559147844ffab3d607d26a6"
 

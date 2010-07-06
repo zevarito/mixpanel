@@ -1,3 +1,5 @@
+files = ['README.rdoc', 'LICENSE', 'Rakefile', 'mixpanel.gemspec', '{spec,lib}/**/*'].map {|f| Dir[f]}.flatten
+
 spec = Gem::Specification.new do |s|
   s.name = "mixpanel"
   s.version = "0.5.1"
@@ -8,20 +10,14 @@ spec = Gem::Specification.new do |s|
   s.homepage = "http://cuboxsa.com"
   s.platform = Gem::Platform::RUBY
   s.summary = "Supports direct request api and javascript requests."
-  s.files = %w[
-    .gitignore
-    README.rdoc
-    LICENSE
-    Rakefile
-    mixpanel.gemspec
-    lib/mixpanel.rb
-    spec/spec_helper.rb
-    spec/mixpanel/mixpanel_spec.rb
-  ]
+  s.files = files
   s.require_path = "lib"
   s.has_rdoc = false
   s.extra_rdoc_files = ["README.rdoc"]
   s.add_dependency 'json'
+  s.add_dependency 'rack'
   s.add_development_dependency 'rspec'
+  s.add_development_dependency 'rack/test'
   s.add_development_dependency 'fakeweb'
+  s.add_development_dependency 'nokogiri'
 end
