@@ -1,8 +1,22 @@
-def setup_rack_application(application)
-  stub!(:app).and_return(Middleware.new(application.new, MIX_PANEL_TOKEN))
+def setup_rack_application(application, options = {})
+  stub!(:app).and_return(Middleware.new(application.new(:callback => options.delete(:callback)), MIX_PANEL_TOKEN))
 end
 
-class HtmlApp
+class DummyApp
+  def initialize(options = {})
+    @callback = options.delete(:callback)
+  end
+
+  def body
+    ""
+  end
+
+  def call(env)
+    ["200", {}, [body]]
+  end
+end
+
+class HtmlApp < DummyApp
   def body
     <<-EOT
       <html>
@@ -19,12 +33,10 @@ class HtmlApp
   end
 end
 
-class DummyApp
-  def body
-    ""
-  end
-
+class HtmlAppWithEvents < HtmlApp
   def call(env)
-    ["200", {}, [body]]
+    @callback.call(env) if !@callback.nil?
+
+    ["200", {"Content-Type" => "text/html"}, [body]]
   end
 end
