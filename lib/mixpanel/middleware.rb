@@ -9,37 +9,34 @@ class Middleware
   def call(env)
     @env = env
 
-    status, headers, response = @app.call(env)
+    @status, @headers, @response = @app.call(env)
 
-    if is_html?(headers)
-      response = build_response(response)
-      headers = update_content_length(response, headers)
+    if is_html?
+      build_response!
+      update_content_length!
     end
 
-    [status, headers, response]
+    [@status, @headers, @response]
   end
 
   private
 
-  def build_response(response)
-    body = ""
-
-    response.each do |part|
+  def build_response!
+    @response.each do |part|
       part.gsub!("</head>", "#{include_mixpanel_scripts}</head>") if !is_ajax?
-      body << part
     end
   end
 
-  def update_content_length(response, headers)
-    headers.merge("Content-Length" => response.join("").length.to_s)
+  def update_content_length!
+    @headers.merge!("Content-Length" => @response.join("").length.to_s)
   end
 
   def is_ajax?
     @env.has_key?("HTTP_X_REQUESTED_WITH") && @env["HTTP_X_REQUESTED_WITH"] == "XMLHttpRequest"
   end
 
-  def is_html?(headers)
-    headers["Content-Type"].include?("text/html") if headers.has_key?("Content-Type")
+  def is_html?
+    @headers["Content-Type"].include?("text/html") if @headers.has_key?("Content-Type")
   end
 
   def include_mixpanel_scripts
