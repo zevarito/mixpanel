@@ -24,6 +24,10 @@ describe Middleware do
       it "should not append mixpanel scripts to head element" do
         Nokogiri::HTML(last_response.body).search('script').should be_empty
       end
+
+      it "should not update Content-Length in headers" do
+        last_response.headers["Content-Length"].should == html_document.length.to_s
+      end
     end
 
     describe "With regular requests" do
@@ -50,7 +54,7 @@ describe Middleware do
       end
 
       it "should update Content-Length in headers" do
-        last_response.headers["Content-Length"].should_not == html_document.length
+        last_response.headers["Content-Length"].should_not == html_document.length.to_s
       end
     end
   end
