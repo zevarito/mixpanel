@@ -25,13 +25,17 @@ class Middleware
     body = ""
 
     response.each do |part|
-      part.gsub!("</head>", "#{include_mixpanel_scripts}</head>")
+      part.gsub!("</head>", "#{include_mixpanel_scripts}</head>") if !is_ajax?
       body << part
     end
   end
 
   def update_content_length(response, headers)
     headers.merge("Content-Length" => response.join("").length.to_s)
+  end
+
+  def is_ajax?
+    @env.has_key?("HTTP_X_REQUESTED_WITH") && @env["HTTP_X_REQUESTED_WITH"] == "XMLHttpRequest"
   end
 
   def is_html?(headers)
