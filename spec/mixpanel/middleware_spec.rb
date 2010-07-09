@@ -61,18 +61,40 @@ describe Middleware do
 
   describe "Tracking appended events" do
     before do
-      mixpanel = Mixpanel.new(MIX_PANEL_TOKEN, {})
-      mixpanel.append_event("Visit", {:article => 1})
-      mixpanel.append_event("Sign in")
-
-      setup_rack_application(DummyApp, :body => html_document, :headers => {"Content-Type" => "text/html"})
-
-      get "/", {}, {"mixpanel_events" => mixpanel.queue}
+      @mixpanel = Mixpanel.new(MIX_PANEL_TOKEN, {})
+      @mixpanel.append_event("Visit", {:article => 1})
+      @mixpanel.append_event("Sign in")
     end
 
-    it "should be tracking the correct events" do
-      last_response.body.should =~ /mpmetrics\.track\("Visit",\s?\{"article":1\}\)/
-      last_response.body.should =~ /mpmetrics\.track\("Sign in",\s?\{\}\)/
+    describe "With ajax requests and text/html response" do
+      before do
+        setup_rack_application(DummyApp, :body => html_document, :headers => {"Content-Type" => "text/html"})
+
+        get "/", {}, {"mixpanel_events" => @mixpanel.queue, "HTTP_X_REQUESTED_WITH" => "XMLHttpRequest"}
+      end
+
+      it "should render only one script tag" do
+        Nokogiri::HTML(last_response.body).search('script').size.should == 1
+      end
+
+      it "should be tracking the correct events inside a script tag" do
+        script = Nokogiri::HTML(last_response.body).search('script')
+        script.inner_html.should =~ /mpmetrics\.track\("Visit",\s?\{"article":1\}\)/
+        script.inner_html.should =~ /mpmetrics\.track\("Sign in",\s?\{\}\)/
+      end
+    end
+
+    describe "With regular requests" do
+      before do
+        setup_rack_application(DummyApp, :body => html_document, :headers => {"Content-Type" => "text/html"})
+
+        get "/", {}, {"mixpanel_events" => @mixpanel.queue}
+      end
+
+      it "should be tracking the correct events" do
+        last_response.body.should =~ /mpmetrics\.track\("Visit",\s?\{"article":1\}\)/
+        last_response.body.should =~ /mpmetrics\.track\("Sign in",\s?\{\}\)/
+      end
     end
   end
 end

@@ -11,10 +11,8 @@ class Middleware
 
     @status, @headers, @response = @app.call(env)
 
-    if is_html?
-      build_response!
-      update_content_length!
-    end
+    build_response!
+    update_content_length!
 
     [@status, @headers, @response]
   end
@@ -23,7 +21,10 @@ class Middleware
 
   def build_response!
     @response.each do |part|
-      part.gsub!("</head>", "#{include_mixpanel_scripts}</head>") if !is_ajax?
+      if is_html?
+        part.gsub!("</head>", "#{render_mixpanel_scripts}</head>") if !is_ajax?
+        part.gsub!("</head>", "#{render_event_tracking_scripts}</head>")
+      end
     end
   end
 
@@ -37,10 +38,6 @@ class Middleware
 
   def is_html?
     @headers["Content-Type"].include?("text/html") if @headers.has_key?("Content-Type")
-  end
-
-  def include_mixpanel_scripts
-    render_mixpanel_scripts + render_event_tracking
   end
 
   def render_mixpanel_scripts
@@ -67,7 +64,7 @@ class Middleware
     @env['mixpanel_events']
   end
 
-  def render_event_tracking
+  def render_event_tracking_scripts
     return "" if queue.empty?
 
     <<-EOT
