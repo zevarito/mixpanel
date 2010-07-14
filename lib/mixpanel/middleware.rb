@@ -21,9 +21,13 @@ class Middleware
 
   def build_response!
     @response.each do |part|
-      if is_html?
-        part.gsub!("</head>", "#{render_mixpanel_scripts}</head>") if !is_ajax?
+      if is_regular_request? && is_html_response?
+        part.gsub!("</head>", "#{render_mixpanel_scripts}</head>")
         part.gsub!("</head>", "#{render_event_tracking_scripts}</head>")
+      elsif is_ajax_request? && is_html_response?
+        part.gsub!(part, render_event_tracking_scripts + part)
+      elsif is_ajax_request? && is_javascript_response?
+        part.gsub!(part, render_event_tracking_scripts(false) + part)
       end
     end
   end
@@ -32,12 +36,20 @@ class Middleware
     @headers.merge!("Content-Length" => @response.join("").length.to_s)
   end
 
-  def is_ajax?
+  def is_regular_request?
+    !is_ajax_request?
+  end
+
+  def is_ajax_request?
     @env.has_key?("HTTP_X_REQUESTED_WITH") && @env["HTTP_X_REQUESTED_WITH"] == "XMLHttpRequest"
   end
 
-  def is_html?
+  def is_html_response?
     @headers["Content-Type"].include?("text/html") if @headers.has_key?("Content-Type")
+  end
+
+  def is_javascript_response?
+    @headers["Content-Type"].include?("text/javascript") if @headers.has_key?("Content-Type")
   end
 
   def render_mixpanel_scripts
@@ -64,13 +76,13 @@ class Middleware
     @env['mixpanel_events']
   end
 
-  def render_event_tracking_scripts
+  def render_event_tracking_scripts(include_script_tag=true)
     return "" if queue.empty?
 
-    <<-EOT
-      <script type='text/javascript'>
-        #{queue.map {|event| %(mpmetrics.track("#{event[:event]}", #{event[:properties].to_json});) }.join("\n")}
-      </script>
-    EOT
+    output = queue.map {|event| %(mpmetrics.track("#{event[:event]}", #{event[:properties].to_json});) }.join("\n")
+
+    output = "try {#{output}} catch(err) {}"
+
+    include_script_tag ? "<script type='text/javascript'>#{output}</script>" : output
   end
 end

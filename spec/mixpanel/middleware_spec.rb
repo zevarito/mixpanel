@@ -68,7 +68,7 @@ describe Middleware do
 
     describe "With ajax requests and text/html response" do
       before do
-        setup_rack_application(DummyApp, :body => html_document, :headers => {"Content-Type" => "text/html"})
+        setup_rack_application(DummyApp, :body => "<p>response</p>", :headers => {"Content-Type" => "text/html"})
 
         get "/", {}, {"mixpanel_events" => @mixpanel.queue, "HTTP_X_REQUESTED_WITH" => "XMLHttpRequest"}
       end
@@ -79,8 +79,26 @@ describe Middleware do
 
       it "should be tracking the correct events inside a script tag" do
         script = Nokogiri::HTML(last_response.body).search('script')
+        script.inner_html.should =~ /try\s?\{(.*)\}\s?catch/m
         script.inner_html.should =~ /mpmetrics\.track\("Visit",\s?\{"article":1\}\)/
         script.inner_html.should =~ /mpmetrics\.track\("Sign in",\s?\{\}\)/
+      end
+    end
+
+    describe "With ajax requests and text/javascript response" do
+      before do
+        setup_rack_application(DummyApp, :body => "alert('response')", :headers => {"Content-Type" => "text/javascript"})
+        get "/", {}, {"mixpanel_events" => @mixpanel.queue, "HTTP_X_REQUESTED_WITH" => "XMLHttpRequest"}
+      end
+
+      it "should not render a script tag" do
+        Nokogiri::HTML(last_response.body).search('script').size.should == 0
+      end
+
+      it "should be tracking the correct events inside a try/catch" do
+        script = last_response.body.match(/try\s?\{(.*)\}\s?catch/m)[1]
+        script.should =~ /mpmetrics\.track\("Visit",\s?\{"article":1\}\)/
+        script.should =~ /mpmetrics\.track\("Sign in",\s?\{\}\)/
       end
     end
 
@@ -89,6 +107,10 @@ describe Middleware do
         setup_rack_application(DummyApp, :body => html_document, :headers => {"Content-Type" => "text/html"})
 
         get "/", {}, {"mixpanel_events" => @mixpanel.queue}
+      end
+
+      it "should render 3 script tags" do
+        Nokogiri::HTML(last_response.body).search('script').size.should == 3
       end
 
       it "should be tracking the correct events" do

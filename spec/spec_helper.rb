@@ -1,3 +1,4 @@
+require 'ruby-debug'
 require File.join(File.dirname(__FILE__), "../lib", "mixpanel")
 require 'rack/test'
 require 'fakeweb'
