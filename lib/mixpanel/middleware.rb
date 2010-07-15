@@ -11,7 +11,7 @@ class Middleware
 
     @status, @headers, @response = @app.call(env)
 
-    build_response!
+    update_response!
     update_content_length!
 
     [@status, @headers, @response]
@@ -19,7 +19,7 @@ class Middleware
 
   private
 
-  def build_response!
+  def update_response!
     @response.each do |part|
       if is_regular_request? && is_html_response?
         part.gsub!("</head>", "#{render_mixpanel_scripts}</head>")
@@ -33,7 +33,9 @@ class Middleware
   end
 
   def update_content_length!
-    @headers.merge!("Content-Length" => @response.join("").length.to_s)
+    new_size = 0
+    @response.each{|part| new_size += part.bytesize}
+    @headers.merge!("Content-Length" => new_size.to_s)
   end
 
   def is_regular_request?
