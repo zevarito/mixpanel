@@ -14,8 +14,12 @@ class Mixpanel
   end
 
   def track_event(event, properties = {})
-    params = build_event(event, properties.merge(:token => @token, :time => Time.now.utc.to_i))
+    params = build_event(event, properties.merge(:token => @token, :time => Time.now.utc.to_i, :ip => ip))
     parse_response request(params)
+  end
+
+  def ip
+    @env.has_key?("REMOTE_ADDR") ? @env["REMOTE_ADDR"] : ""
   end
 
   def queue

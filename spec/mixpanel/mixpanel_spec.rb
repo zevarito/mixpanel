@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Mixpanel do
   before do
-    @mixpanel = Mixpanel.new(MIX_PANEL_TOKEN, @env = {})
+    @mixpanel = Mixpanel.new(MIX_PANEL_TOKEN, @env = {"REMOTE_ADDR" => "127.0.0.1"})
   end
 
   context "Initializing object" do
@@ -27,7 +27,7 @@ describe Mixpanel do
       end
 
       it "should call request method with token and time value" do
-        params = {:event => "Sign up", :properties => {:token => MIX_PANEL_TOKEN, :time => Time.now.utc.to_i}}
+        params = {:event => "Sign up", :properties => {:token => MIX_PANEL_TOKEN, :time => Time.now.utc.to_i, :ip => "127.0.0.1"}}
 
         @mixpanel.should_receive(:request).with(params).and_return("1")
         @mixpanel.track_event("Sign up").should == true
