@@ -83,6 +83,10 @@ describe MixpanelMiddleware do
         script.inner_html.should =~ /mpmetrics\.track\("Visit",\s?\{"article":1\}\)/
         script.inner_html.should =~ /mpmetrics\.track\("Sign in",\s?\{\}\)/
       end
+
+      it "should delete events queue after use it" do
+        last_request.env.has_key?("mixpanel_events").should == false
+      end
     end
 
     describe "With ajax requests and text/javascript response" do
@@ -100,6 +104,10 @@ describe MixpanelMiddleware do
         script.should =~ /mpmetrics\.track\("Visit",\s?\{"article":1\}\)/
         script.should =~ /mpmetrics\.track\("Sign in",\s?\{\}\)/
       end
+
+      it "should delete events queue after use it" do
+        last_request.env.has_key?("mixpanel_events").should == false
+      end
     end
 
     describe "With regular requests" do
@@ -116,6 +124,10 @@ describe MixpanelMiddleware do
       it "should be tracking the correct events" do
         last_response.body.should =~ /mpmetrics\.track\("Visit",\s?\{"article":1\}\)/
         last_response.body.should =~ /mpmetrics\.track\("Sign in",\s?\{\}\)/
+      end
+
+      it "should delete events queue after use it" do
+        last_request.env.has_key?("mixpanel_events").should == false
       end
     end
   end

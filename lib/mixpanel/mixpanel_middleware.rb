@@ -13,6 +13,7 @@ class MixpanelMiddleware
 
     update_response!
     update_content_length!
+    delete_event_queue!
 
     [@status, @headers, @response]
   end
@@ -71,6 +72,10 @@ class MixpanelMiddleware
     }
   </script>
     EOT
+  end
+
+  def delete_event_queue!
+    @env.delete('mixpanel_events')
   end
 
   def queue
