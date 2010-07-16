@@ -1,2 +1,2 @@
 require 'mixpanel/mixpanel'
-require 'mixpanel/middleware'
+require 'mixpanel/mixpanel_middleware'

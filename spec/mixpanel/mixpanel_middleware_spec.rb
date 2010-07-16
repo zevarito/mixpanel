@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Middleware do
+describe MixpanelMiddleware do
   include Rack::Test::Methods
 
   describe "Dummy apps, no text/html" do

@@ -1,6 +1,6 @@
 require 'rack'
 
-class Middleware
+class MixpanelMiddleware
   def initialize(app, mixpanel_token)
     @app = app
     @token = mixpanel_token
