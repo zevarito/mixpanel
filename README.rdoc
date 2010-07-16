@@ -16,6 +16,12 @@ http://mixpanel.com
 
 == How to use it with a Rails application?
 
+In your environment config file add this.
+
+  Rails::Initializer.run do |config|
+
+    config.middleware.use "MixpanelMiddleware", "YOUR_MIXPANEL_API_TOKEN"
+
 In your application_controller class add a method to instance mixpanel.
 
   before_filer :initialize_mixpanel
