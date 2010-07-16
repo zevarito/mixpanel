@@ -1,11 +1,12 @@
 == What is Mixpanel (the service) ?
 
-*Mixpanel* is a real-time analytics service that helps companies understand how users interact with web applications.
+Mixpanel is a real-time analytics service that helps companies understand how users interact with web applications.
 http://mixpanel.com
 
 == What does this Gem?
 
-* Track events with properties directly from your backend
+* Track events with properties directly from your backend.
+* Track events with properties through javascript using a rack middleware.
 
 
 == How to install?
@@ -13,13 +14,29 @@ http://mixpanel.com
   gem install mixpanel
 
 
-== How to use?
+== How to use it with a Rails application?
 
-  require 'mixpanel'
+In your application_controller class add a method to instance mixpanel.
 
-  mixpanel = Mixpanel.new("your_mixpanel_project_token")
+  before_filer :initialize_mixpanel
 
-  mixpanel.track("Sign up", {
-    :referer => "http://example.com",
-    :ip => "4.4.4.4"
-  })
+  def initialize_mixpanel
+    @mixpanel = Mixpanel.new("YOUR_MIXPANEL_API_TOKEN", request.env)
+  end
+
+Then in each request you want to track some event you can use:
+
+To track events directly from your backend...
+
+  @mixpanel.track_event("Sign in", {:some => "property"})
+
+To track events after response with javascript...
+
+  @mixpanel.append_event("Sign in", {:some => "property"})
+
+
+== Notes
+
+It is strongly recommended to call Mixpanel#track_event using an async lib
+like delayed job or similar, otherwise you will delay your server responses
+with mixpanel responses.
