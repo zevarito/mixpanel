@@ -10,11 +10,11 @@ class MixpanelMiddleware
     @env = env
 
     @status, @headers, @response = @app.call(env)
-
+    
     update_response!
     update_content_length!
     delete_event_queue!
-
+    
     [@status, @headers, @response]
   end
 
@@ -23,12 +23,15 @@ class MixpanelMiddleware
   def update_response!
     @response.each do |part|
       if is_regular_request? && is_html_response?
-        part.gsub!("</head>", "#{render_mixpanel_scripts}</head>")
-        part.gsub!("</head>", "#{render_event_tracking_scripts}</head>")
+        insert_at = part.index('</head')
+        unless insert_at.nil?
+          part.insert(insert_at, render_mixpanel_scripts)
+          part.insert(insert_at, render_event_tracking_scripts) unless queue.empty?
+        end
       elsif is_ajax_request? && is_html_response?
-        part.gsub!(part, render_event_tracking_scripts + part)
+        part.insert(0, render_event_tracking_scripts) unless queue.empty?
       elsif is_ajax_request? && is_javascript_response?
-        part.gsub!(part, render_event_tracking_scripts(false) + part)
+        part.insert(0, render_event_tracking_scripts(false)) unless queue.empty?
       end
     end
   end

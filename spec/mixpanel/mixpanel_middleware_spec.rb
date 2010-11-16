@@ -29,7 +29,22 @@ describe MixpanelMiddleware do
         last_response.headers["Content-Length"].should == html_document.length.to_s
       end
     end
+    
+    describe "With large ajax response" do
+      before do
+        setup_rack_application(DummyApp, :body => large_script, :headers => {"Content-Type" => "text/html"})
+        get "/", {}, {"HTTP_X_REQUESTED_WITH" => "XMLHttpRequest"}
+      end
+      
+      it "should not append mixpanel scripts to head element" do
+        last_response.body.index('var mp_protocol').should be_nil
+      end
 
+      it "should pass through if the document is not text/html content type" do
+        last_response.body.should == large_script
+      end
+    end
+    
     describe "With regular requests" do
       before do
         setup_rack_application(DummyApp, :body => html_document, :headers => {"Content-Type" => "text/html"})
