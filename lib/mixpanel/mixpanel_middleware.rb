@@ -28,8 +28,8 @@ class MixpanelMiddleware
       if is_regular_request? && is_html_response?
         insert_at = part.index('</head')
         unless insert_at.nil?
-          part.insert(insert_at, render_mixpanel_scripts)
           part.insert(insert_at, render_event_tracking_scripts) unless queue.empty?
+          part.insert(insert_at, render_mixpanel_scripts) #This will insert the mixpanel initialization code before the queue of tracking events.
         end
       elsif is_ajax_request? && is_html_response?
         part.insert(0, render_event_tracking_scripts) unless queue.empty?
