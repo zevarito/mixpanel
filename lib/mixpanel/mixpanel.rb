@@ -9,8 +9,8 @@ class Mixpanel
     clear_queue
   end
 
-  def append_event(event, properties = {})
-    queue << build_event(event, properties)
+  def append_event(event, properties = {}, type = 'track')
+    queue << [type, build_event(event, properties)]
   end
 
   def track_event(event, properties = {})
