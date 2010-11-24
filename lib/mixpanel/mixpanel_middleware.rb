@@ -107,9 +107,9 @@ class MixpanelMiddleware
     return "" if queue.empty?
 
     if @options[:async]
-      output = queue.map {|type, event| %(mpq.push(["#{type}", "#{event[:event]}", #{event[:properties].to_json}]);) }.join("\n")
+      output = queue.map {|type, arguments| %(mpq.push(["#{type}", #{arguments.join(', ')}]);) }.join("\n")
     else
-      output = queue.map {|type, event| %(mpmetrics.#{type}("#{event[:event]}", #{event[:properties].to_json});) }.join("\n")
+      output = queue.map {|type, arguments| %(mpmetrics.#{type}(#{arguments.join(', ')});) }.join("\n")
     end
 
     output = "try {#{output}} catch(err) {}"

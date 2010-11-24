@@ -1,5 +1,5 @@
-def setup_rack_application(application, options = {})
-  stub!(:app).and_return(MixpanelMiddleware.new(application.new(options), MIX_PANEL_TOKEN))
+def setup_rack_application(application, options = {}, mixpanel_options = {})
+  stub!(:app).and_return(MixpanelMiddleware.new(application.new(options), MIX_PANEL_TOKEN, mixpanel_options))
 end
 
 def html_document

@@ -9,10 +9,14 @@ class Mixpanel
     clear_queue
   end
 
-  def append_event(event, properties = {}, type = 'track')
-    queue << [type, build_event(event, properties)]
+  def append_event(event, properties = {})
+    append_api('track', event, properties)
   end
-
+  
+  def append_api(type, *args)
+    queue << [type, args.map {|arg| arg.to_json}]
+  end
+  
   def track_event(event, properties = {})
     params = build_event(event, properties.merge(:token => @token, :time => Time.now.utc.to_i, :ip => ip))
     parse_response request(params)

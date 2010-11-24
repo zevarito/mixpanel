@@ -7,10 +7,11 @@ Dir[File.expand_path(File.join(File.dirname(__FILE__),'support','**','*.rb'))].e
 
 MIX_PANEL_TOKEN = "e2d8b0bea559147844ffab3d607d26a6"
 
-def mixpanel_queue_should_include(mixpanel, event, properties)
-  mixpanel.queue.each do |type, event_hash|
-    event_hash[:event].should == event
-    event_hash[:properties].should == properties if properties
+
+def mixpanel_queue_should_include(mixpanel, type, *arguments)
+  mixpanel.queue.each do |event_type, event_arguments|
+    event_arguments.should == arguments.map{|arg| arg.to_json}
+    event_type.should == type
   end
 end
 

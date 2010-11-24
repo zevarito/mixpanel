@@ -48,17 +48,37 @@ describe Mixpanel do
 
       it "should append simple events" do
         @mixpanel.append_event("Sign up")
-        mixpanel_queue_should_include(@mixpanel, "Sign up", {})
+        mixpanel_queue_should_include(@mixpanel, "track", "Sign up", {})
       end
 
       it "should append events with properties" do
         @mixpanel.append_event("Sign up", {:referer => 'http://example.com'})
-        mixpanel_queue_should_include(@mixpanel, "Sign up", {:referer => 'http://example.com'})
+        mixpanel_queue_should_include(@mixpanel, "track", "Sign up", {:referer => 'http://example.com'})
       end
 
       it "should give direct access to queue" do
         @mixpanel.append_event("Sign up", {:referer => 'http://example.com'})
         @mixpanel.queue.size.should == 1
+      end
+      
+      it "should provide direct access to the JS api" do
+        @mixpanel.append_api('track', "Sign up", {:referer => 'http://example.com'})
+        mixpanel_queue_should_include(@mixpanel, "track", "Sign up", {:referer => 'http://example.com'})
+      end
+      
+      it "should allow identify to be called through the JS api" do
+        @mixpanel.append_api('identify', "some@one.com")
+        mixpanel_queue_should_include(@mixpanel, "identify", "some@one.com")
+      end
+
+      it "should allow identify to be called through the JS api" do
+        @mixpanel.append_api('identify', "some@one.com")
+        mixpanel_queue_should_include(@mixpanel, "identify", "some@one.com")
+      end
+      
+      it "should allow the tracking of super properties in JS" do
+        @mixpanel.append_api('register', {:user_id => 12345, :email => "some@one.com"})
+        mixpanel_queue_should_include(@mixpanel, 'register', {:user_id => 12345, :email => "some@one.com"})
       end
     end
   end
