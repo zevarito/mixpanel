@@ -46,3 +46,9 @@ To track events after response with javascript...
 It is strongly recommended to call Mixpanel#track_event using an async lib
 like delayed job or similar, otherwise you will delay your server responses
 with mixpanel responses.
+
+== Collaborators
+
+* {Alvaro Gil}[https://github.com/zevarito] (Author)
+* {Nathan Baxter}[https://github.com/LogicWolfei]
+* {Jake Mallory}[https://github.com/tinomen]
