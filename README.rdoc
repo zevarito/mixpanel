@@ -58,7 +58,7 @@ It is strongly recommended to call Mixpanel#track_event using an async lib
 like delayed job or similar, otherwise you will delay your server responses
 with mixpanel responses.
 
-== Collaborators
+== Collaborators and Maintainers
 
 * {Alvaro Gil}[https://github.com/zevarito] (Author)
 * {Nathan Baxter}[https://github.com/LogicWolfe]
