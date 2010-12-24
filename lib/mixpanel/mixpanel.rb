@@ -2,10 +2,13 @@ require "open-uri"
 require 'base64'
 require 'json'
 
+require 'thread'
+
 class Mixpanel
-  def initialize(token, env)
+  def initialize(token, env, async = false)
     @token = token
     @env = env
+    @async = async
     clear_queue
   end
 
@@ -33,6 +36,35 @@ class Mixpanel
   def clear_queue
     @env["mixpanel_events"] = []
   end
+  
+  class <<self
+    WORKER_MUTEX = Mutex.new
+    
+    def worker
+      WORKER_MUTEX.synchronize do
+        @worker || (@worker = IO.popen(self.cmd, 'w'))
+      end
+    end
+    
+    def dispose_worker(w)
+      WORKER_MUTEX.synchronize do
+        if(@worker == w)
+          @worker = nil
+          w.close
+        end
+      end
+    end
+    
+    def cmd
+      @cmd || begin
+        require 'escape'
+        require 'rbconfig'
+        interpreter = File.join(RbConfig::CONFIG['bindir'], RbConfig::CONFIG['RUBY_SO_NAME'])
+        subprocess  = File.join(File.dirname(__FILE__), 'mixpanel_subprocess.rb')
+        @cmd = Escape.shell_command([interpreter, subprocess])
+      end
+    end
+  end
 
   private
 
@@ -44,7 +76,17 @@ class Mixpanel
     data = Base64.encode64(JSON.generate(params)).gsub(/\n/,'')
     url = "http://api.mixpanel.com/track/?data=#{data}"
 
-    open(url).read
+    if(@async)
+      w = Mixpanel.worker
+      begin
+        url << "\n"
+        w.write(url)
+      rescue Errno::EPIPE => e
+        Mixpanel.dispose_worker(w)
+      end
+    else
+      open(url).read
+    end
   end
 
   def build_event(event, properties)

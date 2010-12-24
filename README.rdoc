@@ -33,7 +33,7 @@ In your application_controller class add a method to instance mixpanel.
   before_filter :initialize_mixpanel
 
   def initialize_mixpanel
-    @mixpanel = Mixpanel.new("YOUR_MIXPANEL_API_TOKEN", request.env)
+    @mixpanel = Mixpanel.new("YOUR_MIXPANEL_API_TOKEN", request.env, true)
   end
 
 Then in each request you want to track some event you can use:
@@ -54,12 +54,13 @@ To execute any javascript API call
 
 == Notes
 
-It is strongly recommended to call Mixpanel#track_event using an async lib
-like delayed job or similar, otherwise you will delay your server responses
-with mixpanel responses.
+There are two forms of async operation: 
+* Using MixpanelMiddleware, events are queued via Mixpanel#append_event and inserted into a JavaScript block within the HTML response.  
+* Using Mixpanel.new(…, …, true), events are sent to a subprocess via a pipe and the sub process which asynchronously send events to Mixpanel.  This process uses a single thread to upload events, and may start dropping events if your application generates them at a very high rate.  
 
 == Collaborators and Maintainers
 
 * {Alvaro Gil}[https://github.com/zevarito] (Author)
 * {Nathan Baxter}[https://github.com/LogicWolfe]
 * {Jake Mallory}[https://github.com/tinomen]
+* {Logan Bowers}[https://github.com/loganb]

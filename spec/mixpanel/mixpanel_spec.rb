@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe Mixpanel do
-  before do
+  before(:each) do
     @mixpanel = Mixpanel.new(MIX_PANEL_TOKEN, @env = {"REMOTE_ADDR" => "127.0.0.1"})
   end
 
@@ -80,6 +80,34 @@ describe Mixpanel do
         @mixpanel.append_api('register', {:user_id => 12345, :email => "some@one.com"})
         mixpanel_queue_should_include(@mixpanel, 'register', {:user_id => 12345, :email => "some@one.com"})
       end
+    end
+  end
+  
+  context "Accessing Mixpanel asynchronously" do
+    it "should open a subprocess successfully" do
+      w = Mixpanel.worker
+      w.should == Mixpanel.worker
+    end
+    
+    it "should be able to write lines to the worker" do
+      w = Mixpanel.worker
+      
+      #On most systems this will exceed the pipe buffer size
+      8.times do
+        9000.times do 
+          w.write("\n")
+        end
+        sleep 0.1
+      end
+    end
+    
+    it "should dispose of a worker" do
+      w = Mixpanel.worker
+      Mixpanel.dispose_worker(w)
+      
+      w.closed?.should == true
+      w2 = Mixpanel.worker
+      w2.should_not == w
     end
   end
 end
