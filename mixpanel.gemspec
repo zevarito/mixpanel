@@ -16,6 +16,7 @@ spec = Gem::Specification.new do |s|
   s.extra_rdoc_files = ["README.rdoc"]
   s.add_dependency 'json'
   s.add_dependency 'rack'
+  s.add_dependency 'escape'
   s.add_development_dependency 'rspec'
   s.add_development_dependency 'rack-test'
   s.add_development_dependency 'fakeweb'
