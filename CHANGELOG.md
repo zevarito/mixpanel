@@ -1,3 +1,8 @@
+January 2011
+------------
+
+* Added optional asynchrony usage built in. (Logan Bowers)
+
 Novemeber 2010
 --------------
 
