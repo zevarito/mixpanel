@@ -59,7 +59,7 @@ class Mixpanel
       @cmd || begin
         require 'escape'
         require 'rbconfig'
-        interpreter = File.join(RbConfig::CONFIG['bindir'], RbConfig::CONFIG['RUBY_SO_NAME'])
+        interpreter = File.join(*RbConfig::CONFIG.values_at("bindir", "ruby_install_name")) + RbConfig::CONFIG["EXEEXT"]
         subprocess  = File.join(File.dirname(__FILE__), 'mixpanel_subprocess.rb')
         @cmd = Escape.shell_command([interpreter, subprocess])
       end
