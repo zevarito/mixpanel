@@ -1,6 +1,7 @@
 January 2011
 ------------
 
+* Fix how the interpreter is called for asynchronous call support. (jakemack)
 * Added optional asynchrony usage built in. (Logan Bowers)
 
 Novemeber 2010
