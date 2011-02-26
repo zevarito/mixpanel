@@ -13,11 +13,11 @@ class Mixpanel
   end
   
   # To track events after response with javascript...
-  def append_event(js_block = nil, event, properties = {})
+  def append_event(event, js_block = nil, properties = {})
     if js_block.nil?
       append_api('track', event, properties)
     else
-      queue << [js_block, 'track', [event, properties].map {|arg| arg.to_json} ]
+      queue << ['track', js_block, [event, properties].map {|arg| arg.to_json} ]
     end
   end
   
