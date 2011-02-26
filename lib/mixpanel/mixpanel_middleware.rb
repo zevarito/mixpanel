@@ -102,32 +102,31 @@ class MixpanelMiddleware
     return [] if !@env.has_key?('mixpanel_events') || @env['mixpanel_events'].empty?
     @env['mixpanel_events']
   end
-  
-  def queue2
-    return [] if !@env.has_key?('mixpanel_events_2') || @env['mixpanel_events_2'].empty?
-    @env['mixpanel_events_2']
-  end
 
   def render_event_tracking_scripts(include_script_tag=true)
-    return "" if queue.empty? && queue2.empty?
-    output1 = ""
-    output2 = ""
+    return "" if queue.empty?
+    output = ""
     
     if @options[:async]
-      output1 = queue.map {|type, arguments| %(mpq.push(["#{type}", #{arguments.join(', ')}]);) }.join("\n") unless queue.empty?
-      
-      unless queue2.empty?
-        output2 = queue2.map {|dom, type, arguments| %(jQuery("#{dom[:dom]}").#{dom[:event]}(function() { mpq.push(["#{type}", #{arguments.join(', ')}]); }); }.join("\n")});
+      output_array = queue.map do |js_block, type, arguments|
+        if js_block.nil?
+          %(mpq.push(["#{type}", #{arguments.join(', ')}]);)
+        else
+          js_block.call %(mpq.push(["#{type}", #{arguments.join(', ')}]);)
+        end
       end
     else
-      output1 = queue.map {|type, arguments| %(mpmetrics.#{type}(#{arguments.join(', ')});) }.join("\n") unless queue.empty?
-        
-      unless queue2.empty?
-        output2 = queue2.map {|dom, type, arguments| %(jQuery("#{dom[:dom]}").#{dom[:event]}(function() { mpmetrics.#{type}(#{arguments.join(', ')}); }); }.join("\n")});
+      output_array = queue.map do |js_block, type, arguments|
+        if js_block.nil?
+          %(mpmetrics.#{type}(#{arguments.join(', ')});)
+        else
+          js_block.call %(mpmetrics.#{type}(#{arguments.join(', ')});)
+        end
       end
     end
-
-    output = "try {#{output} #{output2}} catch(err) {}"
+    
+    output = output_array.join("\n")
+    output = "try {#{output}} catch(err) {}"
 
     include_script_tag ? "<script type='text/javascript'>#{output}</script>" : output
   end

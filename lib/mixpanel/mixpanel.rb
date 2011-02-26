@@ -13,13 +13,12 @@ class Mixpanel
   end
   
   # To track events after response with javascript...
-  def append_event(event, properties = {})
-    append_api('track', event, properties)
-  end
-  
-  # To track events that should be binded to DOM elements
-  def append_event_to_div(dom, event, properties = {})
-    queue2 << [dom, 'track', [event.to_json, properties.to_json]]
+  def append_event(js_block = nil, event, properties = {})
+    if js_block.nil?
+      append_api('track', event, properties)
+    else
+      queue << [js_block, 'track', [event.to_json, properties.to_json]]
+    end
   end
   
   # To execute any javascript API call...
@@ -39,10 +38,6 @@ class Mixpanel
 
   def queue
     @env["mixpanel_events"]
-  end
-  
-  def queue2
-    @env["mixpanel_events_2"]
   end
 
   def clear_queue
