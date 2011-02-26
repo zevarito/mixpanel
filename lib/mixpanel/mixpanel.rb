@@ -17,7 +17,7 @@ class Mixpanel
     if js_block.nil?
       append_api('track', event, properties)
     else
-      queue << [js_block, 'track', [event.to_json, properties.to_json]]
+      queue << [js_block, 'track', [event, properties].map {|arg| arg.to_json} ]
     end
   end
   
