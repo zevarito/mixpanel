@@ -11,15 +11,23 @@ class Mixpanel
     @async = async
     clear_queue
   end
-
+  
+  # To track events after response with javascript...
   def append_event(event, properties = {})
     append_api('track', event, properties)
   end
   
+  # To track events that should be binded to DOM elements
+  def append_event_to_div(dom, event, properties = {})
+    queue2 << [dom, 'track', [event.to_json, properties.to_json]]
+  end
+  
+  # To execute any javascript API call...
   def append_api(type, *args)
     queue << [type, args.map {|arg| arg.to_json}]
   end
   
+  # To track events directly from your backend...
   def track_event(event, properties = {})
     params = build_event(event, properties.merge(:token => @token, :time => Time.now.utc.to_i, :ip => ip))
     parse_response request(params)
@@ -31,6 +39,10 @@ class Mixpanel
 
   def queue
     @env["mixpanel_events"]
+  end
+  
+  def queue2
+    @env["mixpanel_events_2"]
   end
 
   def clear_queue
