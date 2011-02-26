@@ -128,6 +128,10 @@ class MixpanelMiddleware
     output = output_array.join("\n")
     output = "try {#{output}} catch(err) {}"
 
-    include_script_tag ? "<script type='text/javascript'>#{output}</script>" : output
+    if include_script_tag
+      "<script type='text/javascript'>jQuery(document).ready(function() { #{output} });</script>"
+    else
+      output
+    end
   end
 end
