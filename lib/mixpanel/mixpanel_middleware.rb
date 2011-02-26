@@ -108,19 +108,19 @@ class MixpanelMiddleware
     output = ""
     
     if @options[:async]
-      output_array = queue.map do |js_block, type, arguments|
+      output_array = queue.map do |type, js_block, arguments|
         if js_block.nil?
           %(mpq.push(["#{type}", #{arguments.join(', ')}]);)
         else
-          js_block.call %(mpq.push(["#{type}", #{arguments.join(', ')}]);)
+          js_block.call("mpq.push([\"#{type}\", #{arguments.join(', ')}]);")
         end
       end
     else
-      output_array = queue.map do |js_block, type, arguments|
+      output_array = queue.map do |type, js_block, arguments|
         if js_block.nil?
-          %(mpmetrics.#{type}(#{arguments.join(', ')});)
+          "mpmetrics.#{type}(#{arguments.join(', ')});"
         else
-          js_block.call %(mpmetrics.#{type}(#{arguments.join(', ')});)
+          js_block.call("mpmetrics.#{type}(#{arguments.join(', ')});")
         end
       end
     end
