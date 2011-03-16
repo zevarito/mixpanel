@@ -46,7 +46,7 @@ To track events after response with javascript...
 
   @mixpanel.append_event("Sign in", {:some => "property"})
 
-To track an event based on users actions that do not hit your server, use javascript:
+To track an event based on users actions that do not hit your server, wrap javascript around the code to listen for the interaction:
 
   @mixpanel.append_event_with_js('Click a div',
           lambda {|code| "$('#divid').click(function() { #{code} });" }, {:some => "property"})
