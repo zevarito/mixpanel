@@ -3,7 +3,7 @@
 Mixpanel is a real-time analytics service that helps companies understand how users interact with web applications.
 http://mixpanel.com
 
-== What does this Gem do?
+== What does this Gem does?
 
 * Track events with properties directly from your backend.
 * Track events with properties through javascript using a rack middleware.
@@ -20,20 +20,20 @@ In your environment config file add this.
 
   Rails::Initializer.run do |config|
 
-    config.middleware.use "MixpanelMiddleware", "YOUR_MIXPANEL_API_TOKEN"
+    config.middleware.use "Mixpanel::Tracker::Middleware", "YOUR_MIXPANEL_API_TOKEN"
 
 If you want to use the asynchronous version of Mixpanel's javascript API
 
   Rails::Initializer.run do |config|
 
-    config.middleware.use "MixpanelMiddleware", "YOUR_MIXPANEL_API_TOKEN", :async => true
+    config.middleware.use "Mixpanel::Tracker::Middleware", "YOUR_MIXPANEL_API_TOKEN", :async => true
 
 In your application_controller class add a method to instance mixpanel.
 
   before_filter :initialize_mixpanel
 
   def initialize_mixpanel
-    @mixpanel = Mixpanel.new("YOUR_MIXPANEL_API_TOKEN", request.env, true)
+    @mixpanel = Mixpanel::Tracker.new("YOUR_MIXPANEL_API_TOKEN", request.env, true)
   end
 
 Then in each request you want to track some event you can use:
@@ -54,9 +54,15 @@ To execute any javascript API call
 
 == Notes
 
-There are two forms of async operation: 
+There are two forms of async operation:
 * Using MixpanelMiddleware, events are queued via Mixpanel#append_event and inserted into a JavaScript block within the HTML response.  
 * Using Mixpanel.new(…, …, true), events are sent to a subprocess via a pipe and the sub process which asynchronously send events to Mixpanel.  This process uses a single thread to upload events, and may start dropping events if your application generates them at a very high rate.  
+
+== Deprecation Notes
+
+For a short term this method will be accepted but it will be deprecated soon.
+
+  Mixpanel.new
 
 == Collaborators and Maintainers
 

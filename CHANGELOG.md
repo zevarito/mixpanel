@@ -1,3 +1,8 @@
+June 2011
+---------
+
+* Refactor Gem to live in Mixpanel::Tracker and avoid conflicts with other gems.
+
 January 2011
 ------------
 

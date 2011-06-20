@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe MixpanelMiddleware do
+describe Mixpanel::Tracker::Middleware do
   include Rack::Test::Methods
 
   describe "Dummy apps, no text/html" do
@@ -136,7 +136,7 @@ describe MixpanelMiddleware do
 
   describe "Tracking async appended events" do
     before do
-      @mixpanel = Mixpanel.new(MIX_PANEL_TOKEN, {})
+      @mixpanel = Mixpanel::Tracker.new(MIX_PANEL_TOKEN, {})
       @mixpanel.append_event("Visit", {:article => 1})
       @mixpanel.append_event("Sign in")
     end
@@ -209,7 +209,7 @@ describe MixpanelMiddleware do
 
   describe "Tracking appended events" do
     before do
-      @mixpanel = Mixpanel.new(MIX_PANEL_TOKEN, {})
+      @mixpanel = Mixpanel::Tracker.new(MIX_PANEL_TOKEN, {})
       @mixpanel.append_event("Visit", {:article => 1})
       @mixpanel.append_event("Sign in")
     end
