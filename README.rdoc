@@ -3,7 +3,7 @@
 Mixpanel is a real-time analytics service that helps companies understand how users interact with web applications.
 http://mixpanel.com
 
-== What does this Gem does?
+== What does this Gem do?
 
 * Track events with properties directly from your backend.
 * Track events with properties through javascript using a rack middleware.
