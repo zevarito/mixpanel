@@ -22,7 +22,9 @@ module Mixpanel
     end
 
     def track_event(event, properties = {})
-      params = build_event(event, properties.merge(:token => @token, :time => Time.now.utc.to_i, :ip => ip))
+      options = { :token => @token, :time => Time.now.utc.to_i, :ip => ip }
+      options.merge!(properties)
+      params = build_event(event, options)
       parse_response request(params)
     end
 
