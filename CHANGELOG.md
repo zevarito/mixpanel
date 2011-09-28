@@ -1,3 +1,10 @@
+September 2011
+--------------
+
+* Updated middleware with latest mixpanel javascript (eddiesiegel)
+* Allow overriding of token, time, and ip address (Joe Van Dyk)
+* Spelling correction (jellybob)
+
 June 2011
 ---------
 
