@@ -46,30 +46,44 @@ describe Mixpanel::Tracker::Middleware do
     end
     
     describe "With regular requests" do
-      before do
-        setup_rack_application(DummyApp, {:body => html_document, :headers => {"Content-Type" => "text/html"}}, {:async => true})
-        get "/"
+      describe "With js in head" do
+        before do
+          setup_rack_application(DummyApp, {:body => html_document, :headers => {"Content-Type" => "text/html"}}, {:async => true, :insert_js_last => false})
+          get "/"
+        end
+
+        it "should append mixpanel scripts to head element" do
+          Nokogiri::HTML(last_response.body).search('head script').should_not be_empty
+          Nokogiri::HTML(last_response.body).search('body script').should be_empty
+        end
+
+        it "should have 1 included script" do
+          Nokogiri::HTML(last_response.body).search('script').size.should == 1
+        end
+
+        it "should use the specified token instantiating mixpanel lib" do
+          last_response.should =~ /mpq.push\(\["init", "#{MIX_PANEL_TOKEN}"\]\)/
+        end
+
+        it "should define Content-Length if not exist" do
+          last_response.headers.has_key?("Content-Length").should == true
+        end
+
+        it "should update Content-Length in headers" do
+          last_response.headers["Content-Length"].should_not == html_document.length.to_s
+        end
       end
 
-      it "should append mixpanel scripts to head element" do
-        Nokogiri::HTML(last_response.body).search('head script').should_not be_empty
-        Nokogiri::HTML(last_response.body).search('body script').should be_empty
-      end
+      describe "With js last" do
+        before do
+          setup_rack_application(DummyApp, {:body => html_document, :headers => {"Content-Type" => "text/html"}}, {:async => true, :insert_js_last => true})
+          get "/"
+        end
 
-      it "should have 1 included script" do
-        Nokogiri::HTML(last_response.body).search('script').size.should == 1
-      end
-
-      it "should use the specified token instantiating mixpanel lib" do
-        last_response.should =~ /mpq.push\(\["init", "#{MIX_PANEL_TOKEN}"\]\)/
-      end
-
-      it "should define Content-Length if not exist" do
-        last_response.headers.has_key?("Content-Length").should == true
-      end
-
-      it "should update Content-Length in headers" do
-        last_response.headers["Content-Length"].should_not == html_document.length.to_s
+        it "should append mixpanel scripts to end of body element" do
+          Nokogiri::HTML(last_response.body).search('head script').should be_empty
+          Nokogiri::HTML(last_response.body).search('body script').should_not be_empty
+        end
       end
     end
   end
@@ -106,30 +120,44 @@ describe Mixpanel::Tracker::Middleware do
     end
     
     describe "With regular requests" do
-      before do
-        setup_rack_application(DummyApp, :body => html_document, :headers => {"Content-Type" => "text/html"})
-        get "/"
+      describe "With js in head" do
+        before do
+          setup_rack_application(DummyApp, {:body => html_document, :headers => {"Content-Type" => "text/html"}}, {:insert_js_last => false})
+          get "/"
+        end
+
+        it "should append mixpanel scripts to head element" do
+          Nokogiri::HTML(last_response.body).search('head script').should_not be_empty
+          Nokogiri::HTML(last_response.body).search('body script').should be_empty
+        end
+
+        it "should have 2 included scripts" do
+          Nokogiri::HTML(last_response.body).search('script').size.should == 2
+        end
+
+        it "should use the specified token instantiating mixpanel lib" do
+          last_response.should =~ /new MixpanelLib\('#{MIX_PANEL_TOKEN}'\)/
+        end
+
+        it "should define Content-Length if not exist" do
+          last_response.headers.has_key?("Content-Length").should == true
+        end
+
+        it "should update Content-Length in headers" do
+          last_response.headers["Content-Length"].should_not == html_document.length.to_s
+        end
       end
 
-      it "should append mixpanel scripts to head element" do
-        Nokogiri::HTML(last_response.body).search('head script').should_not be_empty
-        Nokogiri::HTML(last_response.body).search('body script').should be_empty
-      end
+      describe "With js last" do
+        before do
+          setup_rack_application(DummyApp, {:body => html_document, :headers => {"Content-Type" => "text/html"}}, {:insert_js_last => true})
+          get "/"
+        end
 
-      it "should have 2 included scripts" do
-        Nokogiri::HTML(last_response.body).search('script').size.should == 2
-      end
-
-      it "should use the specified token instantiating mixpanel lib" do
-        last_response.should =~ /new MixpanelLib\('#{MIX_PANEL_TOKEN}'\)/
-      end
-
-      it "should define Content-Length if not exist" do
-        last_response.headers.has_key?("Content-Length").should == true
-      end
-
-      it "should update Content-Length in headers" do
-        last_response.headers["Content-Length"].should_not == html_document.length.to_s
+        it "should append mixpanel scripts to end of body element" do
+          Nokogiri::HTML(last_response.body).search('head script').should be_empty
+          Nokogiri::HTML(last_response.body).search('body script').should_not be_empty
+        end
       end
     end
   end
