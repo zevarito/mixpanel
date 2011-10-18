@@ -8,7 +8,7 @@ module Mixpanel
         @token = mixpanel_token
         @options = {
           :async => false,
-          :insert_js_last => true
+          :insert_js_last => false
         }.merge(options)
       end
 

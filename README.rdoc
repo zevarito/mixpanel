@@ -28,6 +28,12 @@ If you want to use the asynchronous version of Mixpanel's javascript API
 
     config.middleware.use "Mixpanel::Tracker::Middleware", "YOUR_MIXPANEL_API_TOKEN", :async => true
 
+By default the scripts are inserted into the head of the html response. If you'd prefer the scripts to run after all rendering has completed you can set the `insert_js_last` flag and they'll be added at the end of the body tag:
+
+  Rails::Initializer.run do |config|
+
+    config.middleware.use "Mixpanel::Tracker::Middleware", "YOUR_MIXPANEL_API_TOKEN", :async => true, :insert_js_last => true
+
 In your application_controller class add a method to instance mixpanel.
 
   before_filter :initialize_mixpanel
