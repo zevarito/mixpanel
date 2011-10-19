@@ -23,7 +23,14 @@ describe Mixpanel::Tracker do
   context "Accessing Mixpanel through direct request" do
     context "Tracking events" do
       it "should track simple events" do
-        @mixpanel.track_event("Sign up").should == true
+        now_in_utc = Time.utc(2009, 10, 10, 13, 55, 36)
+        SpecHelper.stub_time_dot_now(now_in_utc) do
+          output = StringIO.new
+          Mixpanel::Configuration.logger = Logger.new(output)
+          @mixpanel.track_event("Sign up").should == true
+
+          output.string.should include("[Mixpanel] [10/Oct/2009 13:55:36 UTC] Sign up with properties:")
+        end
       end
 
       it "should call request method with token and time value" do
@@ -49,6 +56,17 @@ describe Mixpanel::Tracker do
       it "should append simple events" do
         @mixpanel.append_event("Sign up")
         mixpanel_queue_should_include(@mixpanel, "track", "Sign up", {})
+      end
+
+      it "should write to log" do
+        now_in_utc = Time.utc(2009, 10, 10, 13, 55, 36)
+        SpecHelper.stub_time_dot_now(now_in_utc) do
+          output = StringIO.new
+          Mixpanel::Configuration.logger = Logger.new(output)
+          @mixpanel.append_event("Sign up")
+
+          output.string.should include("[Mixpanel] [10/Oct/2009 13:55:36 UTC] Sign up with properties:")
+        end
       end
 
       it "should append events with properties" do

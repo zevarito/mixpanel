@@ -1,3 +1,5 @@
+require 'logger'
+require 'mixpanel/configuration'
 require 'mixpanel/tracker'
 
 module Mixpanel
