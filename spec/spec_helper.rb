@@ -18,3 +18,23 @@ end
 # Fakeweb
 FakeWeb.allow_net_connect = false
 FakeWeb.register_uri(:any, /http:\/\/api\.mixpanel\.com.*/, :body => "1")
+
+module SpecHelper
+  def self.stub_time_dot_now(desired_time)
+    Time.class_eval do
+      class << self
+        alias original_now now
+      end
+    end
+    (class << Time; self; end).class_eval do
+      define_method(:now) { desired_time }
+    end
+    yield
+  ensure
+    Time.class_eval do
+      class << self
+        alias now original_now
+      end
+    end
+  end
+end

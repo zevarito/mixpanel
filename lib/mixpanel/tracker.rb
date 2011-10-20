@@ -14,6 +14,7 @@ module Mixpanel
     end
 
     def append_event(event, properties = {})
+      write_log(event, properties)
       append_api('track', event, properties)
     end
 
@@ -24,6 +25,8 @@ module Mixpanel
     def track_event(event, properties = {})
       options = { :token => @token, :time => Time.now.utc.to_i, :ip => ip }
       options.merge!(properties)
+
+      write_log(event, options)
       params = build_event(event, options)
       parse_response request(params)
     end
@@ -38,6 +41,10 @@ module Mixpanel
 
     def clear_queue
       @env["mixpanel_events"] = []
+    end
+
+    def write_log(event, options)
+      Configuration.logger.debug "[Mixpanel] [#{current_time}] #{event} with properties: #{options}"
     end
 
     class <<self
@@ -70,6 +77,10 @@ module Mixpanel
     end
 
     private
+
+    def current_time
+      Time.now.utc.strftime("%d/%b/%Y %H:%M:%S %Z")
+    end
 
     def parse_response(response)
       response == "1" ? true : false
