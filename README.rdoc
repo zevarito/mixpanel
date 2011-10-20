@@ -57,6 +57,34 @@ To execute any javascript API call
   @mixpanel.append_api("register", {:some => "property"})
   @mixpanel.append_api("identify", "Unique Identifier")
 
+== Resque and Rails example
+
+{Resque is a Redis-backed Ruby library for creating background jobs}[https://github.com/defunkt/resque]
+
+    class MixpanelTrackEventJob
+      @queue = :slow
+
+      def mixpanel(request_env)
+        Mixpanel.new(MIXPANEL_TOKEN, request_env)
+      end
+
+      def perform(name, params, request_env)
+        mixpanel(request_env).track_event(name, params)
+      end
+    end
+
+    class UsersController < ApplicationController
+      def create
+        @user = User.new(params[:user])
+
+        if @user.save
+          MixpanelTrackEventJob.enqueue("Sign up", {:invited => params[:invited]}, request.env)
+          redirect_to user_root_path
+        else
+          render :new
+        end
+     end
+   end
 
 == Notes
 
