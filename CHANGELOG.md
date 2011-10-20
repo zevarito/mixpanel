@@ -1,3 +1,7 @@
+October 2011
+--------------
+* Ability to insert JS scripts at the bottom of Body element (James Ferguson)
+
 September 2011
 --------------
 
