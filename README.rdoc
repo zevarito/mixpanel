@@ -76,5 +76,5 @@ For a short term this method will be accepted but it will be deprecated soon.
 * {Nathan Baxter}[https://github.com/LogicWolfe]
 * {Jake Mallory}[https://github.com/tinomen]
 * {Logan Bowers}[https://github.com/loganb]
-* {jakemack} [https://github.com/jakemack]
-* {James Ferguson} [https://github.com/JamesFerguson]
+* {jakemack}[https://github.com/jakemack]
+* {James Ferguson}[https://github.com/JamesFerguson]
