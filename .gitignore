@@ -1,2 +1,3 @@
 .bundle
 mixpanel*.gem
+Gemfile.lock

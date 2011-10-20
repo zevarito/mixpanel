@@ -7,7 +7,8 @@ module Mixpanel
         @app = app
         @token = mixpanel_token
         @options = {
-          :async => false
+          :async => false,
+          :insert_js_last => false
         }.merge(options)
       end
 
@@ -28,7 +29,7 @@ module Mixpanel
       def update_response!
         @response.each do |part|
           if is_regular_request? && is_html_response?
-            insert_at = part.index('</head')
+            insert_at = part.index(@options[:insert_js_last] ? '</body' : '</head')
             unless insert_at.nil?
               part.insert(insert_at, render_event_tracking_scripts) unless queue.empty?
               part.insert(insert_at, render_mixpanel_scripts) #This will insert the mixpanel initialization code before the queue of tracking events.

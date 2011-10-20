@@ -7,7 +7,7 @@ describe Mixpanel::Tracker do
 
   context "Initializing object" do
     it "should have an instance variable for token and events" do
-      @mixpanel.instance_variables.should include("@token", "@env")
+      @mixpanel.instance_variables.map(&:to_s).should include("@token", "@env")
     end
   end
 

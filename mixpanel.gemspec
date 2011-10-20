@@ -21,4 +21,7 @@ spec = Gem::Specification.new do |s|
   s.add_development_dependency 'rack-test'
   s.add_development_dependency 'fakeweb'
   s.add_development_dependency 'nokogiri'
+  s.add_development_dependency 'rake'
+  s.add_development_dependency 'ruby-debug19' if RUBY_VERSION =~ /^1\.9/
+  s.add_development_dependency 'ruby-debug' if RUBY_VERSION =~ /^1\.8/
 end
