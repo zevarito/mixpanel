@@ -1,9 +1,11 @@
-require 'spec/rake/spectask'
+begin
+  require 'rspec/core/rake_task'
+rescue LoadError => e
+  puts "RSpec not loaded - make sure it's installed and you're using bundle exec"
+  exit 1
+end
+
+RSpec::Core::RakeTask.new(:spec)
 
 task :default => :spec
 
-desc "Run all examples"
-Spec::Rake::SpecTask.new('spec') do |t|
-  t.spec_opts = ["-u -c -fs"]
-  t.spec_files = FileList['spec/**/*_spec.rb']
-end

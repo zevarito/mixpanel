@@ -1,3 +1,4 @@
+require 'mixpanel/version'
 require 'mixpanel/tracker'
 
 module Mixpanel
