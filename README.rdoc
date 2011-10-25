@@ -59,6 +59,8 @@ To execute any javascript API call
 
 == Resque and Rails example
 
+If you don't want to use the built in Mixpanel Gem async feature bellow there is an example about how to make async calls using Resque.
+
 {Resque is a Redis-backed Ruby library for creating background jobs}[https://github.com/defunkt/resque]
 
     class MixpanelTrackEventJob
@@ -97,6 +99,10 @@ There are two forms of async operation:
 For a short term this method will be accepted but it will be deprecated soon.
 
   Mixpanel.new
+
+== Collaborations
+
+All collaborations are welcome to this project, please fork and make a pull request.
 
 == Collaborators and Maintainers
 
