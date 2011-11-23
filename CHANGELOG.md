@@ -1,3 +1,8 @@
+November 2011
+-------------
+
+* Fix content length update, IE. Send file bug (Brad Wilson)
+
 October 2011
 --------------
 * Ability to insert JS scripts at the bottom of Body element (James Ferguson)
