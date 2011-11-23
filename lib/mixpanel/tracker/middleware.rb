@@ -17,9 +17,11 @@ module Mixpanel
 
         @status, @headers, @response = @app.call(env)
 
-        update_response!
-        update_content_length!
-        delete_event_queue!
+        if is_trackable_response?
+          update_response!
+          update_content_length!
+          delete_event_queue!
+        end
 
         [@status, @headers, @response]
       end
@@ -62,6 +64,10 @@ module Mixpanel
 
       def is_javascript_response?
         @headers["Content-Type"].include?("text/javascript") if @headers.has_key?("Content-Type")
+      end
+
+      def is_trackable_response?
+        is_html_response? || is_javascript_response?
       end
 
       def render_mixpanel_scripts
