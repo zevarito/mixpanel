@@ -1,3 +1,7 @@
+December 2011
+-------------
+* Add HTTP_X_FORWARDED_FOR to obtain ip addresses, Heroku thing. (Alvaro Gil)
+
 November 2011
 -------------
 

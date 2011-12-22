@@ -26,11 +26,20 @@ describe Mixpanel::Tracker do
         @mixpanel.track_event("Sign up").should == true
       end
 
-      it "should call request method with token and time value" do
+      it "should call request method with token, time value and ip address" do
         params = {:event => "Sign up", :properties => {:token => MIX_PANEL_TOKEN, :time => Time.now.utc.to_i, :ip => "127.0.0.1"}}
 
         @mixpanel.should_receive(:request).with(params).and_return("1")
         @mixpanel.track_event("Sign up").should == true
+      end
+
+      it "should call request method with token, and send ip address from HTTP_X_FORWARDED_FOR" do
+        @mixpanel = Mixpanel::Tracker.new(MIX_PANEL_TOKEN, @env = {"HTTP_X_FORWARDED_FOR" => "10.1.0.2"})
+
+        params = {:event => "Sign up", :properties => {:token => MIX_PANEL_TOKEN, :time => Time.now.utc.to_i, :ip => "10.1.0.2"}}
+
+        @mixpanel.should_receive(:request).with(params).and_return("1")
+        @mixpanel.track_event("Sign up")
       end
     end
   end

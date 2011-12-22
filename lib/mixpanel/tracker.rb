@@ -29,7 +29,13 @@ module Mixpanel
     end
 
     def ip
-      @env.has_key?("REMOTE_ADDR") ? @env["REMOTE_ADDR"] : ""
+      if @env.has_key?("HTTP_X_FORWARDED_FOR")
+        @env["HTTP_X_FORWARDED_FOR"].split(",").last
+      elsif @env.has_key?("REMOTE_ADDR")
+        @env["REMOTE_ADDR"]
+      else
+        ""
+      end
     end
 
     def queue
