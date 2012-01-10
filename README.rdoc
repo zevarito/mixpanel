@@ -57,6 +57,10 @@ To execute any javascript API call
   @mixpanel.append_api("register", {:some => "property"})
   @mixpanel.append_api("identify", "Unique Identifier")
 
+If you are proxying Mixpanel API requests then you can set a custom url and additionally stop the token from being sent by marking it as false if you're going to let the proxy add it...
+
+  @mixpanel = Mixpanel::Tracker.new(flase, request.env, true, 'http://localhost:8000/mixpanelproxy?data=')
+
 == Resque and Rails example
 
 If you don't want to use the built in Mixpanel Gem async feature bellow there is an example about how to make async calls using Resque.

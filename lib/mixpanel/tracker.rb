@@ -6,10 +6,11 @@ require 'mixpanel/tracker/middleware'
 
 module Mixpanel
   class Tracker
-    def initialize(token, env, async = false)
+    def initialize(token, env, async = false, url = 'http://api.mixpanel.com/track/?data=')
       @token = token
       @env = env
       @async = async
+      @url = url
       clear_queue
     end
 
@@ -22,7 +23,8 @@ module Mixpanel
     end
 
     def track_event(event, properties = {})
-      options = { :token => @token, :time => Time.now.utc.to_i, :ip => ip }
+      options = { :time => Time.now.utc.to_i, :ip => ip }
+      options.merge!( :token => @token ) if @token
       options.merge!(properties)
       params = build_event(event, options)
       parse_response request(params)
@@ -83,7 +85,7 @@ module Mixpanel
 
     def request(params)
       data = Base64.encode64(JSON.generate(params)).gsub(/\n/,'')
-      url = "http://api.mixpanel.com/track/?data=#{data}"
+      url = @url + data
 
       if(@async)
         w = Tracker.worker
