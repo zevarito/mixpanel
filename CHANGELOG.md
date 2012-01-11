@@ -1,3 +1,7 @@
+January 2012
+-------------
+* Ability to proxy Mixpanel calls (Mark Cheverton)
+
 December 2011
 -------------
 * Add HTTP_X_FORWARDED_FOR to obtain ip addresses, Heroku thing. (Alvaro Gil)
