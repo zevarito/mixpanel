@@ -53,7 +53,7 @@ To execute any javascript API call
 
 If you are proxying Mixpanel API requests then you can set a custom url and additionally stop the token from being sent by marking it as false if you're going to let the proxy add it...
 
-  @mixpanel = Mixpanel::Tracker.new(flase, request.env, true, 'http://localhost:8000/mixpanelproxy?data=')
+  @mixpanel = Mixpanel::Tracker.new(false, request.env, true, 'http://localhost:8000/mixpanelproxy?data=')
 
 == Resque and Rails example
 
