@@ -17,7 +17,7 @@ describe Mixpanel::Tracker::Middleware do
   describe "Appending async mixpanel scripts" do
     describe "With ajax requests" do
       before do
-        setup_rack_application(DummyApp, {:body => html_document, :headers => {"Content-Type" => "text/html"}}, {:async => true})
+        setup_rack_application(DummyApp, {:body => html_document, :headers => {"Content-Type" => "text/html"}})
         get "/", {}, {"HTTP_X_REQUESTED_WITH" => "XMLHttpRequest"}
       end
 
@@ -32,7 +32,7 @@ describe Mixpanel::Tracker::Middleware do
 
     describe "With large ajax response" do
       before do
-        setup_rack_application(DummyApp, {:body => large_script, :headers => {"Content-Type" => "text/html"}}, {:async => true})
+        setup_rack_application(DummyApp, {:body => large_script, :headers => {"Content-Type" => "text/html"}})
         get "/", {}, {"HTTP_X_REQUESTED_WITH" => "XMLHttpRequest"}
       end
 
@@ -48,7 +48,7 @@ describe Mixpanel::Tracker::Middleware do
     describe "With regular requests" do
       describe "With js in head" do
         before do
-          setup_rack_application(DummyApp, {:body => html_document, :headers => {"Content-Type" => "text/html"}}, {:async => true, :insert_js_last => false})
+          setup_rack_application(DummyApp, {:body => html_document, :headers => {"Content-Type" => "text/html"}}, {:insert_js_last => false})
           get "/"
         end
 
@@ -62,7 +62,7 @@ describe Mixpanel::Tracker::Middleware do
         end
 
         it "should use the specified token instantiating mixpanel lib" do
-          last_response.should =~ /mpq.push\(\["init", "#{MIX_PANEL_TOKEN}"\]\)/
+          last_response.body.should =~ /mixpanel\.init\("#{MIX_PANEL_TOKEN}"\)/ 
         end
 
         it "should define Content-Length if not exist" do
@@ -76,7 +76,7 @@ describe Mixpanel::Tracker::Middleware do
 
       describe "With js last" do
         before do
-          setup_rack_application(DummyApp, {:body => html_document, :headers => {"Content-Type" => "text/html"}}, {:async => true, :insert_js_last => true})
+          setup_rack_application(DummyApp, {:body => html_document, :headers => {"Content-Type" => "text/html"}}, {:insert_js_last => true})
           get "/"
         end
 
@@ -131,12 +131,12 @@ describe Mixpanel::Tracker::Middleware do
           Nokogiri::HTML(last_response.body).search('body script').should be_empty
         end
 
-        it "should have 2 included scripts" do
-          Nokogiri::HTML(last_response.body).search('script').size.should == 2
+        it "should have 1 included script" do
+          Nokogiri::HTML(last_response.body).search('script').size.should == 1
         end
 
         it "should use the specified token instantiating mixpanel lib" do
-          last_response.should =~ /new MixpanelLib\('#{MIX_PANEL_TOKEN}'\)/
+          last_response.body.should =~ /mixpanel\.init\("#{MIX_PANEL_TOKEN}"\)/          
         end
 
         it "should define Content-Length if not exist" do
@@ -171,7 +171,7 @@ describe Mixpanel::Tracker::Middleware do
 
     describe "With ajax requests and text/html response" do
       before do
-        setup_rack_application(DummyApp, {:body => "<p>response</p>", :headers => {"Content-Type" => "text/html"}}, {:async => true})
+        setup_rack_application(DummyApp, {:body => "<p>response</p>", :headers => {"Content-Type" => "text/html"}})
 
         get "/", {}, {"mixpanel_events" => @mixpanel.queue, "HTTP_X_REQUESTED_WITH" => "XMLHttpRequest"}
       end
@@ -182,9 +182,8 @@ describe Mixpanel::Tracker::Middleware do
 
       it "should be tracking the correct events inside a script tag" do
         script = Nokogiri::HTML(last_response.body).search('script')
-        script.inner_html.should =~ /try\s?\{(.*)\}\s?catch/m
-        script.inner_html.should =~ /mpq\.push\(\["track",\s?"Visit",\s?\{"article":1\}\]\)/
-        script.inner_html.should =~ /mpq\.push\(\["track",\s?"Sign in",\s?\{\}\]\)/
+        script.inner_html.should =~ /mixpanel\.track\("Visit",\s?\{"article":1\}\)/
+        script.inner_html.should =~ /mixpanel\.track\("Sign in",\s?\{\}\)/
       end
 
       it "should delete events queue after use it" do
@@ -194,7 +193,7 @@ describe Mixpanel::Tracker::Middleware do
 
     describe "With ajax requests and text/javascript response" do
       before do
-        setup_rack_application(DummyApp, {:body => "alert('response')", :headers => {"Content-Type" => "text/javascript"}}, {:async => true})
+        setup_rack_application(DummyApp, {:body => "alert('response')", :headers => {"Content-Type" => "text/javascript"}})
         get "/", {}, {"mixpanel_events" => @mixpanel.queue, "HTTP_X_REQUESTED_WITH" => "XMLHttpRequest"}
       end
 
@@ -204,8 +203,8 @@ describe Mixpanel::Tracker::Middleware do
 
       it "should be tracking the correct events inside a try/catch" do
         script = last_response.body.match(/try\s?\{(.*)\}\s?catch/m)[1]
-        script.should =~ /mpq\.push\(\["track",\s?"Visit",\s?\{"article":1\}\]\)/
-        script.should =~ /mpq\.push\(\["track",\s?"Sign in",\s?\{\}\]\)/
+        script.should =~ /mixpanel\.track\("Visit",\s?\{"article":1\}\)/
+        script.should =~ /mixpanel\.track\("Sign in",\s?\{\}\)/
       end
 
       it "should delete events queue after use it" do
@@ -215,7 +214,7 @@ describe Mixpanel::Tracker::Middleware do
 
     describe "With regular requests" do
       before do
-        setup_rack_application(DummyApp, {:body => html_document, :headers => {"Content-Type" => "text/html"}}, {:async => true})
+        setup_rack_application(DummyApp, {:body => html_document, :headers => {"Content-Type" => "text/html"}})
 
         get "/", {}, {"mixpanel_events" => @mixpanel.queue}
       end
@@ -225,8 +224,8 @@ describe Mixpanel::Tracker::Middleware do
       end
 
       it "should be tracking the correct events" do
-        last_response.body.should =~ /mpq\.push\(\["track",\s?"Visit",\s?\{"article":1\}\]\)/
-        last_response.body.should =~ /mpq\.push\(\["track",\s?"Sign in",\s?\{\}\]\)/
+        last_response.body.should =~ /mixpanel\.track\("Visit",\s?\{"article":1\}\)/
+        last_response.body.should =~ /mixpanel\.track\("Sign in",\s?\{\}\)/
       end
 
       it "should delete events queue after use it" do
@@ -256,8 +255,8 @@ describe Mixpanel::Tracker::Middleware do
       it "should be tracking the correct events inside a script tag" do
         script = Nokogiri::HTML(last_response.body).search('script')
         script.inner_html.should =~ /try\s?\{(.*)\}\s?catch/m
-        script.inner_html.should =~ /mpmetrics\.track\("Visit",\s?\{"article":1\}\)/
-        script.inner_html.should =~ /mpmetrics\.track\("Sign in",\s?\{\}\)/
+        script.inner_html.should =~ /mixpanel\.track\("Visit",\s?\{"article":1\}\)/
+        script.inner_html.should =~ /mixpanel\.track\("Sign in",\s?\{\}\)/
       end
 
       it "should delete events queue after use it" do
@@ -277,8 +276,8 @@ describe Mixpanel::Tracker::Middleware do
 
       it "should be tracking the correct events inside a try/catch" do
         script = last_response.body.match(/try\s?\{(.*)\}\s?catch/m)[1]
-        script.should =~ /mpmetrics\.track\("Visit",\s?\{"article":1\}\)/
-        script.should =~ /mpmetrics\.track\("Sign in",\s?\{\}\)/
+        script.should =~ /mixpanel\.track\("Visit",\s?\{"article":1\}\)/
+        script.should =~ /mixpanel\.track\("Sign in",\s?\{\}\)/
       end
 
       it "should delete events queue after use it" do
@@ -293,13 +292,13 @@ describe Mixpanel::Tracker::Middleware do
         get "/", {}, {"mixpanel_events" => @mixpanel.queue}
       end
 
-      it "should render 3 script tags" do
-        Nokogiri::HTML(last_response.body).search('script').size.should == 3
+      it "should render 2 script tags" do
+        Nokogiri::HTML(last_response.body).search('script').size.should == 2
       end
 
       it "should be tracking the correct events" do
-        last_response.body.should =~ /mpmetrics\.track\("Visit",\s?\{"article":1\}\)/
-        last_response.body.should =~ /mpmetrics\.track\("Sign in",\s?\{\}\)/
+        last_response.body.should =~ /mixpanel\.track\("Visit",\s?\{"article":1\}\)/
+        last_response.body.should =~ /mixpanel\.track\("Sign in",\s?\{\}\)/
       end
 
       it "should delete events queue after use it" do

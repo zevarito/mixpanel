@@ -7,7 +7,6 @@ module Mixpanel
         @app = app
         @token = mixpanel_token
         @options = {
-          :async => false,
           :insert_js_last => false
         }.merge(options)
       end
@@ -71,32 +70,21 @@ module Mixpanel
       end
 
       def render_mixpanel_scripts
-        if @options[:async]
-            <<-EOT
-          <script type='text/javascript'>
-            var mpq = [];
-            mpq.push(["init", "#{@token}"]);
-            (function(){var b,a,e,d,c;b=document.createElement("script");b.type="text/javascript";b.async=true;b.src=(document.location.protocol==="https:"?"https:":"http:")+"//api.mixpanel.com/site_media/js/api/mixpanel.js";a=document.getElementsByTagName("script")[0];a.parentNode.insertBefore(b,a);e=function(f){return function(){mpq.push([f].concat(Array.prototype.slice.call(arguments,0)))}};d=["track","track_links","track_forms","register","register_once","identify","name_tag","set_config"];for(c=0;c<d.length;c++){mpq[d[c]]=e(d[c])}})();
-          </script>
-            EOT
-        else
           <<-EOT
         <script type='text/javascript'>
-          var mp_protocol = (('https:' == document.location.protocol) ? 'https://' : 'http://');
-          document.write(unescape('%3Cscript src="' + mp_protocol + 'api.mixpanel.com/site_media/js/api/mixpanel.js" type="text/javascript"%3E%3C/script%3E'));
-        </script>
-        <script type='text/javascript'>
-          try {
-            var mpmetrics = new MixpanelLib('#{@token}');
-          } catch(err) {
-            null_fn = function () {};
-            var mpmetrics = {
-              track: null_fn,  track_funnel: null_fn,  register: null_fn,  register_once: null_fn, register_funnel: null_fn
-            };
-          }
+          (function(d,c){var a,b,g,e;a=d.createElement("script");a.type="text/javascript";
+              a.async=!0;a.src=("https:"===d.location.protocol?"https:":"http:")+
+              '//api.mixpanel.com/site_media/js/api/mixpanel.2.js';b=d.getElementsByTagName("script")[0];
+              b.parentNode.insertBefore(a,b);c._i=[];c.init=function(a,d,f){var b=c;
+              "undefined"!==typeof f?b=c[f]=[]:f="mixpanel";g=['disable','track','track_pageview',
+              'track_links','track_forms','register','register_once','unregister','identify',
+              'name_tag','set_config'];
+              for(e=0;e<g.length;e++)(function(a){b[a]=function(){b.push([a].concat(
+              Array.prototype.slice.call(arguments,0)))}})(g[e]);c._i.push([a,d,f])};window.mixpanel=c}
+              )(document,window.mixpanel||[]);
+              mixpanel.init("#{@token}");
         </script>
           EOT
-        end
       end
 
       def delete_event_queue!
@@ -111,12 +99,7 @@ module Mixpanel
       def render_event_tracking_scripts(include_script_tag=true)
         return "" if queue.empty?
 
-        if @options[:async]
-          output = queue.map {|type, arguments| %(mpq.push(["#{type}", #{arguments.join(', ')}]);) }.join("\n")
-        else
-          output = queue.map {|type, arguments| %(mpmetrics.#{type}(#{arguments.join(', ')});) }.join("\n")
-        end
-
+        output = queue.map {|type, arguments| %(mixpanel.#{type}(#{arguments.join(', ')});) }.join("\n")
         output = "try {#{output}} catch(err) {}"
 
         include_script_tag ? "<script type='text/javascript'>#{output}</script>" : output
