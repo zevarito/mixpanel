@@ -1,4 +1,5 @@
 require 'rack'
+require 'json'
 
 module Mixpanel
   class Tracker
@@ -7,7 +8,8 @@ module Mixpanel
         @app = app
         @token = mixpanel_token
         @options = {
-          :insert_js_last => false
+          :insert_js_last => false,
+          :config => {}
         }.merge(options)
       end
 
@@ -83,6 +85,7 @@ module Mixpanel
               Array.prototype.slice.call(arguments,0)))}})(g[e]);c._i.push([a,d,f])};window.mixpanel=c}
               )(document,window.mixpanel||[]);
               mixpanel.init("#{@token}");
+              mixpanel.set_config(#{@options[:config].to_json});
         </script>
           EOT
       end
