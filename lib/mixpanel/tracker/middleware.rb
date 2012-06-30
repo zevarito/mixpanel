@@ -72,22 +72,15 @@ module Mixpanel
       end
 
       def render_mixpanel_scripts
-          <<-EOT
-        <script type='text/javascript'>
-          (function(d,c){var a,b,g,e;a=d.createElement("script");a.type="text/javascript";
-              a.async=!0;a.src=("https:"===d.location.protocol?"https:":"http:")+
-              '//api.mixpanel.com/site_media/js/api/mixpanel.2.js';b=d.getElementsByTagName("script")[0];
-              b.parentNode.insertBefore(a,b);c._i=[];c.init=function(a,d,f){var b=c;
-              "undefined"!==typeof f?b=c[f]=[]:f="mixpanel";g=['disable','track','track_pageview',
-              'track_links','track_forms','register','register_once','unregister','identify',
-              'name_tag','set_config'];
-              for(e=0;e<g.length;e++)(function(a){b[a]=function(){b.push([a].concat(
-              Array.prototype.slice.call(arguments,0)))}})(g[e]);c._i.push([a,d,f])};window.mixpanel=c}
-              )(document,window.mixpanel||[]);
-              mixpanel.init("#{@token}");
-              mixpanel.set_config(#{@options[:config].to_json});
-        </script>
-          EOT
+        <<-EOT
+          <!-- start Mixpanel -->
+          <script type="text/javascript">(function(c,b){var a,d,h,e;a=c.createElement("script");a.type="text/javascript";a.async=!0;a.src=("https:"===c.location.protocol?"https:":"http:")+'//api.mixpanel.com/site_media/js/api/mixpanel.2.js';d=c.getElementsByTagName("script")[0];d.parentNode.insertBefore(a,d);b._i=[];b.init=function(a,c,f){function d(a,b){var c=b.split(".");2==c.length&&(a=a[c[0]],b=c[1]);a[b]=function(){a.push([b].concat(Array.prototype.slice.call(arguments,0)))}}var g=b;"undefined"!==typeof f?g=
+          b[f]=[]:f="mixpanel";g.people=g.people||[];h="disable track track_pageview track_links track_forms register register_once unregister identify name_tag set_config people.set people.increment".split(" ");for(e=0;e<h.length;e++)d(g,h[e]);b._i.push([a,c,f])};window.mixpanel=b})(document,window.mixpanel||[]);
+          mixpanel.init("#{@token}");
+          mixpanel.set_config(#{@options[:config].to_json});
+          </script>
+          <!-- end Mixpanel -->
+        EOT
       end
 
       def delete_event_queue!

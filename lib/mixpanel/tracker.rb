@@ -17,6 +17,19 @@ module Mixpanel
     def append_event(event, properties = {})
       append_api('track', event, properties)
     end
+    
+    def append_person_event(properties = {})
+      # evaluate symbols and rewrite
+      special_properties = %w{email created_at}
+      special_properties.each do |key|
+        symbolized_key = key.to_sym
+        if properties.has_key?(symbolized_key)
+          properties["$#{key}"] = properties[symbolized_key]
+          properties.delete(symbolized_key)
+        end
+      end
+      append_api('people.set', properties)
+    end
 
     def append_api(type, *args)
       queue << [type, args.map {|arg| arg.to_json}]
