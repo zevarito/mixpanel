@@ -20,7 +20,7 @@ module Mixpanel
     
     def append_person_event(properties = {})
       # evaluate symbols and rewrite
-      special_properties = %w{email created_at}
+      special_properties = %w{email created}
       special_properties.each do |key|
         symbolized_key = key.to_sym
         if properties.has_key?(symbolized_key)
