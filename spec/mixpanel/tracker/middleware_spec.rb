@@ -194,8 +194,6 @@ describe Mixpanel::Tracker::Middleware do
       end
 
       it "should be tracking the correct events inside a script tag" do
-        puts last_response.body
-
         script = Nokogiri::HTML(last_response.body).search('script')
         check_for_default_appends_on script.inner_html
       end
