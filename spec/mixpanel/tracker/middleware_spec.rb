@@ -235,8 +235,6 @@ describe Mixpanel::Tracker::Middleware do
       end
 
       it "should be tracking the correct events" do
-        puts last_response.body
-
         check_for_default_appends_on last_response.body
       end
 
