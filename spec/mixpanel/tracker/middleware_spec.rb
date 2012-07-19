@@ -1,5 +1,19 @@
 require 'spec_helper'
 
+def exec_default_appends_on(mixpanel)
+  mixpanel.append_event("Visit", {:article => 1})
+  mixpanel.append_event("Sign in")
+  mixpanel.append_person_event(:first_name => "foo", :last_name => "bar", :username => "foobar")
+  mixpanel.append_person_increment_event(:sign_in_rate)
+end
+
+def check_for_default_appends_on(txt)
+  txt.should =~ /mixpanel\.track\("Visit",\s?\{"article":1\}\)/
+  txt.should =~ /mixpanel\.track\("Sign in",\s?\{\}\)/
+  txt.should =~ /mixpanel\.people\.set\(\{(?=.*\"username\"\s?:\s?\"foobar\")(?=.*\"\$first_name\"\s?:\s?\"foo\")(?=.*\"\$last_name\"\s?:\s?\"bar\")[^}]*\}\)/
+  txt.should =~ /mixpanel\.people\.increment\(\"sign_in_rate\"\s?,\s?1\)/
+end
+
 describe Mixpanel::Tracker::Middleware do
   include Rack::Test::Methods
 
@@ -62,7 +76,7 @@ describe Mixpanel::Tracker::Middleware do
         end
 
         it "should use the specified token instantiating mixpanel lib" do
-          last_response.body.should =~ /mixpanel\.init\("#{MIX_PANEL_TOKEN}"\)/ 
+          last_response.body.should =~ /mixpanel\.init\("#{MIX_PANEL_TOKEN}"\)/
         end
 
         it "should define Content-Length if not exist" do
@@ -136,7 +150,7 @@ describe Mixpanel::Tracker::Middleware do
         end
 
         it "should use the specified token instantiating mixpanel lib" do
-          last_response.body.should =~ /mixpanel\.init\("#{MIX_PANEL_TOKEN}"\)/          
+          last_response.body.should =~ /mixpanel\.init\("#{MIX_PANEL_TOKEN}"\)/
         end
 
         it "should define Content-Length if not exist" do
@@ -165,8 +179,7 @@ describe Mixpanel::Tracker::Middleware do
   describe "Tracking async appended events" do
     before do
       @mixpanel = Mixpanel::Tracker.new(MIX_PANEL_TOKEN, {})
-      @mixpanel.append_event("Visit", {:article => 1})
-      @mixpanel.append_event("Sign in")
+      exec_default_appends_on @mixpanel
     end
 
     describe "With ajax requests and text/html response" do
@@ -182,8 +195,7 @@ describe Mixpanel::Tracker::Middleware do
 
       it "should be tracking the correct events inside a script tag" do
         script = Nokogiri::HTML(last_response.body).search('script')
-        script.inner_html.should =~ /mixpanel\.track\("Visit",\s?\{"article":1\}\)/
-        script.inner_html.should =~ /mixpanel\.track\("Sign in",\s?\{\}\)/
+        check_for_default_appends_on script.inner_html
       end
 
       it "should delete events queue after use it" do
@@ -203,8 +215,7 @@ describe Mixpanel::Tracker::Middleware do
 
       it "should be tracking the correct events inside a try/catch" do
         script = last_response.body.match(/try\s?\{(.*)\}\s?catch/m)[1]
-        script.should =~ /mixpanel\.track\("Visit",\s?\{"article":1\}\)/
-        script.should =~ /mixpanel\.track\("Sign in",\s?\{\}\)/
+        check_for_default_appends_on script
       end
 
       it "should delete events queue after use it" do
@@ -224,8 +235,7 @@ describe Mixpanel::Tracker::Middleware do
       end
 
       it "should be tracking the correct events" do
-        last_response.body.should =~ /mixpanel\.track\("Visit",\s?\{"article":1\}\)/
-        last_response.body.should =~ /mixpanel\.track\("Sign in",\s?\{\}\)/
+        check_for_default_appends_on last_response.body
       end
 
       it "should delete events queue after use it" do
@@ -237,8 +247,7 @@ describe Mixpanel::Tracker::Middleware do
   describe "Tracking appended events" do
     before do
       @mixpanel = Mixpanel::Tracker.new(MIX_PANEL_TOKEN, {})
-      @mixpanel.append_event("Visit", {:article => 1})
-      @mixpanel.append_event("Sign in")
+      exec_default_appends_on @mixpanel
     end
 
     describe "With ajax requests and text/html response" do
@@ -254,9 +263,7 @@ describe Mixpanel::Tracker::Middleware do
 
       it "should be tracking the correct events inside a script tag" do
         script = Nokogiri::HTML(last_response.body).search('script')
-        script.inner_html.should =~ /try\s?\{(.*)\}\s?catch/m
-        script.inner_html.should =~ /mixpanel\.track\("Visit",\s?\{"article":1\}\)/
-        script.inner_html.should =~ /mixpanel\.track\("Sign in",\s?\{\}\)/
+        check_for_default_appends_on script.inner_html
       end
 
       it "should delete events queue after use it" do
@@ -276,8 +283,7 @@ describe Mixpanel::Tracker::Middleware do
 
       it "should be tracking the correct events inside a try/catch" do
         script = last_response.body.match(/try\s?\{(.*)\}\s?catch/m)[1]
-        script.should =~ /mixpanel\.track\("Visit",\s?\{"article":1\}\)/
-        script.should =~ /mixpanel\.track\("Sign in",\s?\{\}\)/
+        check_for_default_appends_on script
       end
 
       it "should delete events queue after use it" do
@@ -297,8 +303,7 @@ describe Mixpanel::Tracker::Middleware do
       end
 
       it "should be tracking the correct events" do
-        last_response.body.should =~ /mixpanel\.track\("Visit",\s?\{"article":1\}\)/
-        last_response.body.should =~ /mixpanel\.track\("Sign in",\s?\{\}\)/
+        check_for_default_appends_on last_response.body
       end
 
       it "should delete events queue after use it" do
