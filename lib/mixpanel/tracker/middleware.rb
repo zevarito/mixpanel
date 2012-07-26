@@ -9,6 +9,7 @@ module Mixpanel
         @token = mixpanel_token
         @options = {
           :insert_js_last => false,
+          :persist => false,
           :config => {}
         }.merge(options)
       end
@@ -68,6 +69,7 @@ module Mixpanel
       end
 
       def is_trackable_response?
+        return false if @status == 302
         is_html_response? || is_javascript_response?
       end
 
@@ -94,12 +96,21 @@ module Mixpanel
       end
 
       def delete_event_queue!
-        @env.delete('mixpanel_events')
+        if @options[:persist]
+          (@env['rack.session']).delete('mixpanel_events')
+        else
+          @env.delete('mixpanel_events')
+        end
       end
 
       def queue
-        return [] if !@env.has_key?('mixpanel_events') || @env['mixpanel_events'].empty?
-        @env['mixpanel_events']
+        if @options[:persist]
+          return [] if !(@env['rack.session']).has_key?('mixpanel_events') || @env['rack.session']['mixpanel_events'].empty?
+          @env['rack.session']['mixpanel_events']
+        else
+          return [] if !@env.has_key?('mixpanel_events') || @env['mixpanel_events'].empty?
+          @env['mixpanel_events']
+        end
       end
 
       def render_event_tracking_scripts(include_script_tag=true)
