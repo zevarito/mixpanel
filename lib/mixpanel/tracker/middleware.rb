@@ -20,6 +20,7 @@ module Mixpanel
         @status, @headers, @response = @app.call(env)
 
         if is_trackable_response?
+          merge_queue! if @options[:persist]
           update_response!
           update_content_length!
           delete_event_queue!
@@ -110,6 +111,21 @@ module Mixpanel
         else
           return [] if !@env.has_key?('mixpanel_events') || @env['mixpanel_events'].empty?
           @env['mixpanel_events']
+        end
+      end
+
+      def merge_queue!
+        present_hash = {}
+        special_events = ['identify', 'name_tag', 'people.set', 'register']
+        queue.uniq!
+
+        queue.reverse_each do |item|
+          is_special = special_events.include?(item[0])
+          if present_hash[item[0]] and is_special
+            queue.delete(item)
+          else
+            present_hash[item[0]] = true if is_special
+          end
         end
       end
 
