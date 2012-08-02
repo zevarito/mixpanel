@@ -1,4 +1,4 @@
-require "open-uri"
+require 'open-uri'
 require 'base64'
 require 'json'
 require 'thread'
@@ -8,9 +8,9 @@ module Mixpanel
   class Tracker
     def initialize(token, env, async = false, url = 'http://api.mixpanel.com/track/?data=')
       @token = token
-      @env = env
+      @env   = env
       @async = async
-      @url = url
+      @url   = url
       clear_queue
     end
 
@@ -31,21 +31,21 @@ module Mixpanel
     end
 
     def ip
-      if @env.has_key?("HTTP_X_FORWARDED_FOR")
-        @env["HTTP_X_FORWARDED_FOR"].split(",").last
-      elsif @env.has_key?("REMOTE_ADDR")
-        @env["REMOTE_ADDR"]
+      if @env.has_key?('HTTP_X_FORWARDED_FOR')
+        @env['HTTP_X_FORWARDED_FOR'].split(',').last
+      elsif @env.has_key?('REMOTE_ADDR')
+        @env['REMOTE_ADDR']
       else
-        ""
+        ''
       end
     end
 
     def queue
-      @env["mixpanel_events"]
+      @env['mixpanel_events']
     end
 
     def clear_queue
-      @env["mixpanel_events"] = []
+      @env['mixpanel_events'] = []
     end
 
     class <<self
@@ -70,7 +70,7 @@ module Mixpanel
         @cmd || begin
           require 'escape'
           require 'rbconfig'
-          interpreter = File.join(*RbConfig::CONFIG.values_at("bindir", "ruby_install_name")) + RbConfig::CONFIG["EXEEXT"]
+          interpreter = File.join(*RbConfig::CONFIG.values_at('bindir', 'ruby_install_name')) + RbConfig::CONFIG['EXEEXT']
           subprocess  = File.join(File.dirname(__FILE__), 'tracker/subprocess.rb')
           @cmd = Escape.shell_command([interpreter, subprocess])
         end
@@ -80,12 +80,12 @@ module Mixpanel
     private
 
     def parse_response(response)
-      response == "1" ? true : false
+      response == '1' ? true : false
     end
 
     def request(params)
-      data = Base64.encode64(JSON.generate(params)).gsub(/\n/,'')
-      url = @url + data
+      data = Base64.encode64(JSON.generate(params)).gsub(/\n/, '')
+      url  = @url + data
 
       if(@async)
         w = Tracker.worker
@@ -101,7 +101,7 @@ module Mixpanel
     end
 
     def build_event(event, properties)
-      {:event => event, :properties => properties}
+      { :event => event, :properties => properties }
     end
   end
 end
