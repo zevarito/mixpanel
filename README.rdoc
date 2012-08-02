@@ -65,7 +65,7 @@ If you don't want to use the built in Mixpanel Gem async feature bellow there is
       @queue = :slow
 
       def mixpanel(request_env)
-        Mixpanel.new(MIXPANEL_TOKEN, request_env)
+        Mixpanel::Tracker.new(MIXPANEL_TOKEN, request_env)
       end
 
       def perform(name, params, request_env)
@@ -90,7 +90,7 @@ If you don't want to use the built in Mixpanel Gem async feature bellow there is
 
 There are two forms of async operation:
 * Using MixpanelMiddleware, events are queued via Mixpanel#append_event and inserted into a JavaScript block within the HTML response.  
-* Using Mixpanel.new(…, …, true), events are sent to a subprocess via a pipe and the sub process which asynchronously send events to Mixpanel.  This process uses a single thread to upload events, and may start dropping events if your application generates them at a very high rate.  
+* Using Mixpanel::Tracker.new(…, …, true), events are sent to a subprocess via a pipe and the sub process which asynchronously send events to Mixpanel.  This process uses a single thread to upload events, and may start dropping events if your application generates them at a very high rate.  
 
 == Deprecation Notes
 
