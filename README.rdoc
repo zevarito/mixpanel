@@ -86,6 +86,24 @@ If you don't want to use the built in Mixpanel Gem async feature bellow there is
      end
    end
 
+== Persistence
+
+If you would like, the Mixpanel gem may be configured to store its queue in a Rack session. This allows events to be stored through redirects, helpful if you sign in and redirect but want to associate an event with that action.
+
+The mixpanel gem will also remove duplicate events from your queue for information that should only be trasmitted to the API once, such as `mixpanel.identify`, `mixpanel.name_tag`, `mixpanel.people.set`, and `mixpanel.register`. This allows you to use a before filter to set these variables, redirect, and still have them only transmitted once.
+
+To enable persistence, you must set it in two places. Once when you initialize the middleware...
+
+    config.middleware.use "Mixpanel::Tracker::Middleware", "YOUR_MIXPANEL_API_TOKEN", persist: true
+
+And once when you initialize a tracker:
+
+    before_filter :initialize_mixpanel
+
+    def initialize_mixpanel
+      @mixpanel = Mixpanel::Tracker.new("YOUR_MIXPANEL_API_TOKEN", request.env, true, true)
+    end
+
 == Notes
 
 There are two forms of async operation:
@@ -113,3 +131,4 @@ All collaborations are welcome to this project, please fork and make a pull requ
 * {Brad Wilson}[https://github.com/bradx3]
 * {Mark Cheverton}[https://github.com/ennui2342]
 * {Jamie Quint}[https://github.com/jamiequint]
+* {Ryan Schmukler}[https://github.com/rschmukler]

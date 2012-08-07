@@ -6,12 +6,18 @@ require 'mixpanel/tracker/middleware'
 
 module Mixpanel
   class Tracker
-    def initialize(token, env, async = false, url = 'http://api.mixpanel.com/track/?data=')
+    def initialize(token, env, async = false, persist=false, url = 'http://api.mixpanel.com/track/?data=')
       @token = token
       @env = env
       @async = async
       @url = url
-      clear_queue
+      @persist = persist
+
+      if @persist
+        @env["rack.session"]["mixpanel_events"] ||= []
+      else
+        clear_queue
+      end
     end
 
     def append_event(event, properties = {})
@@ -58,11 +64,19 @@ module Mixpanel
     end
 
     def queue
-      @env["mixpanel_events"]
+      if @persist
+        return @env["rack.session"]["mixpanel_events"]
+      else
+        return @env["mixpanel_events"]
+      end
     end
 
     def clear_queue
-      @env["mixpanel_events"] = []
+      if @persist
+        @env["rack.session"]["mixpanel_events"] = []
+      else
+        @env["mixpanel_events"] = []
+      end
     end
 
     class <<self
