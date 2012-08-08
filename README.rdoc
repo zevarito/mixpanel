@@ -16,7 +16,7 @@ http://mixpanel.com
 
 == How to use it with a Rails application?
 
-Add this to your environment config file or create a new initializer for it...
+Add this to your specific environment configuration file (located in config/environments/) or create a new initializer for it...
 
   config.middleware.use "Mixpanel::Tracker::Middleware", "YOUR_MIXPANEL_API_TOKEN"
 
@@ -46,7 +46,7 @@ To track events after response with javascript...
 
   @mixpanel.append_event("Sign in", {:some => "property"})
 
-To execute any javascript API call
+To execute any javascript API call...
 
   @mixpanel.append_api("register", {:some => "property"})
   @mixpanel.append_api("identify", "Unique Identifier")
