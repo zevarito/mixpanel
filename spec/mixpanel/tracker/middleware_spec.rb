@@ -10,7 +10,7 @@ end
 def check_for_default_appends_on(txt)
   txt.should =~ /mixpanel\.track\("Visit",\s?\{"article":1\}\)/
   txt.should =~ /mixpanel\.track\("Sign in",\s?\{\}\)/
-  txt.should =~ /mixpanel\.people\.set\(\{(?=.*\"username\"\s?:\s?\"foobar\")(?=.*\"\$first_name\"\s?:\s?\"foo\")(?=.*\"\$last_name\"\s?:\s?\"bar\")[^}]*\}\)/
+  txt.should =~ /mixpanel\.people\.set\(\{\"\$.[^$]*\":\"foo\",\"\$.[^$]*\":\"bar\",\"\$.[^$]*\":\"foobar\"\}\);\nmixpanel.people.increment\(\"sign_in_rate\",\s?1\);/
   txt.should =~ /mixpanel\.people\.increment\(\"sign_in_rate\"\s?,\s?1\)/
 end
 
