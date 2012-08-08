@@ -1,4 +1,5 @@
 require 'rack'
+require 'json'
 
 module Mixpanel
   class Tracker
@@ -7,8 +8,9 @@ module Mixpanel
         @app = app
         @token = mixpanel_token
         @options = {
-          :async => false,
-          :insert_js_last => false
+          :insert_js_last => false,
+          :persist => false,
+          :config => {}
         }.merge(options)
       end
 
@@ -18,6 +20,7 @@ module Mixpanel
         @status, @headers, @response = @app.call(env)
 
         if is_trackable_response?
+          merge_queue! if @options[:persist]
           update_response!
           update_content_length!
           delete_event_queue!
@@ -67,56 +70,69 @@ module Mixpanel
       end
 
       def is_trackable_response?
+        return false if @status == 302
         is_html_response? || is_javascript_response?
       end
 
       def render_mixpanel_scripts
-        if @options[:async]
-            <<-EOT
-          <script type='text/javascript'>
-            var mpq = [];
-            mpq.push(["init", "#{@token}"]);
-            (function(){var b,a,e,d,c;b=document.createElement("script");b.type="text/javascript";b.async=true;b.src=(document.location.protocol==="https:"?"https:":"http:")+"//api.mixpanel.com/site_media/js/api/mixpanel.js";a=document.getElementsByTagName("script")[0];a.parentNode.insertBefore(b,a);e=function(f){return function(){mpq.push([f].concat(Array.prototype.slice.call(arguments,0)))}};d=["track","track_links","track_forms","register","register_once","identify","name_tag","set_config"];for(c=0;c<d.length;c++){mpq[d[c]]=e(d[c])}})();
+        <<-EOT
+          <!-- start Mixpanel -->
+          <script type="text/javascript">
+            (function(c,a){var b,d,h,e;b=c.createElement("script");b.type="text/javascript";
+            b.async=!0;b.src=("https:"===c.location.protocol?"https:":"http:")+
+            '//api.mixpanel.com/site_media/js/api/mixpanel.2.js';d=c.getElementsByTagName("script")[0];
+            d.parentNode.insertBefore(b,d);a._i=[];a.init=function(b,c,f){function d(a,b){
+            var c=b.split(".");2==c.length&&(a=a[c[0]],b=c[1]);a[b]=function(){a.push([b].concat(
+            Array.prototype.slice.call(arguments,0)))}}var g=a;"undefined"!==typeof f?g=a[f]=[]:
+            f="mixpanel";g.people=g.people||[];h=['disable','track','track_pageview','track_links',
+            'track_forms','register','register_once','unregister','identify','name_tag',
+            'set_config','people.set','people.increment'];for(e=0;e<h.length;e++)d(g,h[e]);
+            a._i.push([b,c,f])};a.__SV=1.1;window.mixpanel=a})(document,window.mixpanel||[]);
+
+            mixpanel.init("#{@token}");
+            mixpanel.set_config(#{@options[:config].to_json});
           </script>
-            EOT
-        else
-          <<-EOT
-        <script type='text/javascript'>
-          var mp_protocol = (('https:' == document.location.protocol) ? 'https://' : 'http://');
-          document.write(unescape('%3Cscript src="' + mp_protocol + 'api.mixpanel.com/site_media/js/api/mixpanel.js" type="text/javascript"%3E%3C/script%3E'));
-        </script>
-        <script type='text/javascript'>
-          try {
-            var mpmetrics = new MixpanelLib('#{@token}');
-          } catch(err) {
-            null_fn = function () {};
-            var mpmetrics = {
-              track: null_fn,  track_funnel: null_fn,  register: null_fn,  register_once: null_fn, register_funnel: null_fn
-            };
-          }
-        </script>
-          EOT
-        end
+          <!-- end Mixpanel -->
+        EOT
       end
 
       def delete_event_queue!
-        @env.delete('mixpanel_events')
+        if @options[:persist]
+          (@env['rack.session']).delete('mixpanel_events')
+        else
+          @env.delete('mixpanel_events')
+        end
       end
 
       def queue
-        return [] if !@env.has_key?('mixpanel_events') || @env['mixpanel_events'].empty?
-        @env['mixpanel_events']
+        if @options[:persist]
+          return [] if !(@env['rack.session']).has_key?('mixpanel_events') || @env['rack.session']['mixpanel_events'].empty?
+          @env['rack.session']['mixpanel_events']
+        else
+          return [] if !@env.has_key?('mixpanel_events') || @env['mixpanel_events'].empty?
+          @env['mixpanel_events']
+        end
+      end
+
+      def merge_queue!
+        present_hash = {}
+        special_events = ['identify', 'name_tag', 'people.set', 'register']
+        queue.uniq!
+
+        queue.reverse_each do |item|
+          is_special = special_events.include?(item[0])
+          if present_hash[item[0]] and is_special
+            queue.delete(item)
+          else
+            present_hash[item[0]] = true if is_special
+          end
+        end
       end
 
       def render_event_tracking_scripts(include_script_tag=true)
         return "" if queue.empty?
 
-        if @options[:async]
-          output = queue.map {|type, arguments| %(mpq.push(["#{type}", #{arguments.join(', ')}]);) }.join("\n")
-        else
-          output = queue.map {|type, arguments| %(mpmetrics.#{type}(#{arguments.join(', ')});) }.join("\n")
-        end
-
+        output = queue.map {|type, arguments| %(mixpanel.#{type}(#{arguments.join(', ')});) }.join("\n")
         output = "try {#{output}} catch(err) {}"
 
         include_script_tag ? "<script type='text/javascript'>#{output}</script>" : output
