@@ -6,16 +6,39 @@ require 'mixpanel/tracker/middleware'
 
 module Mixpanel
   class Tracker
-    def initialize(token, env, async = false, url = 'http://api.mixpanel.com/track/?data=')
+    def initialize(token, env, async = false, persist=false, url = 'http://api.mixpanel.com/track/?data=')
       @token = token
       @env = env
       @async = async
       @url = url
-      clear_queue
+      @persist = persist
+
+      if @persist
+        @env["rack.session"]["mixpanel_events"] ||= []
+      else
+        clear_queue
+      end
     end
 
     def append_event(event, properties = {})
       append_api('track', event, properties)
+    end
+
+    def append_person_event(properties = {})
+      # evaluate symbols and rewrite
+      special_properties = %w{email created first_name last_name last_login username country_code}
+      special_properties.each do |key|
+        symbolized_key = key.to_sym
+        if properties.has_key?(symbolized_key)
+          properties["$#{key}"] = properties[symbolized_key]
+          properties.delete(symbolized_key)
+        end
+      end
+      append_api('people.set', properties)
+    end
+
+    def append_person_increment_event(property, increment=1)
+      append_api('people.increment', property, increment)
     end
 
     def append_api(type, *args)
@@ -41,11 +64,19 @@ module Mixpanel
     end
 
     def queue
-      @env["mixpanel_events"]
+      if @persist
+        return @env["rack.session"]["mixpanel_events"]
+      else
+        return @env["mixpanel_events"]
+      end
     end
 
     def clear_queue
-      @env["mixpanel_events"] = []
+      if @persist
+        @env["rack.session"]["mixpanel_events"] = []
+      else
+        @env["mixpanel_events"] = []
+      end
     end
 
     class <<self

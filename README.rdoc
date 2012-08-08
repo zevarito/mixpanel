@@ -20,14 +20,14 @@ Add this to your specific environment configuration file (located in config/envi
 
   config.middleware.use "Mixpanel::Tracker::Middleware", "YOUR_MIXPANEL_API_TOKEN"
 
-If you want to use the asynchronous version of Mixpanel's javascript API
-
-  config.middleware.use "Mixpanel::Tracker::Middleware", "YOUR_MIXPANEL_API_TOKEN", :async => true
-
 By default the scripts are inserted into the head of the html response. If you'd prefer the scripts to run after all rendering has completed you can set the insert_js_last flag and they'll be added at the end of the body tag. This will work whether or not you opt for the aynchronous version of the API. However, when inserting js into an ajax response it will have no effect:
 
-  config.middleware.use "Mixpanel::Tracker::Middleware", "YOUR_MIXPANEL_API_TOKEN", :async => true, :insert_js_last => true
+  config.middleware.use "Mixpanel::Tracker::Middleware", "YOUR_MIXPANEL_API_TOKEN", :insert_js_last => true
 
+You can also pass Mixpanel configuration details as seen here (https://mixpanel.com/docs/integration-libraries/javascript-full-api#set_config):
+
+  config.middleware.use "Mixpanel::Tracker::Middleware", "YOUR_MIXPANEL_API_TOKEN", :config => {:debug => true}
+  
 In your application_controller class add a method to instance mixpanel.
 
   before_filter :initialize_mixpanel
@@ -86,6 +86,24 @@ If you don't want to use the built in Mixpanel Gem async feature bellow there is
      end
    end
 
+== Persistence
+
+If you would like, the Mixpanel gem may be configured to store its queue in a Rack session. This allows events to be stored through redirects, helpful if you sign in and redirect but want to associate an event with that action.
+
+The mixpanel gem will also remove duplicate events from your queue for information that should only be trasmitted to the API once, such as `mixpanel.identify`, `mixpanel.name_tag`, `mixpanel.people.set`, and `mixpanel.register`. This allows you to use a before filter to set these variables, redirect, and still have them only transmitted once.
+
+To enable persistence, you must set it in two places. Once when you initialize the middleware...
+
+    config.middleware.use "Mixpanel::Tracker::Middleware", "YOUR_MIXPANEL_API_TOKEN", persist: true
+
+And once when you initialize a tracker:
+
+    before_filter :initialize_mixpanel
+
+    def initialize_mixpanel
+      @mixpanel = Mixpanel::Tracker.new("YOUR_MIXPANEL_API_TOKEN", request.env, true, true)
+    end
+
 == Notes
 
 There are two forms of async operation:
@@ -112,3 +130,5 @@ All collaborations are welcome to this project, please fork and make a pull requ
 * {James Ferguson}[https://github.com/JamesFerguson]
 * {Brad Wilson}[https://github.com/bradx3]
 * {Mark Cheverton}[https://github.com/ennui2342]
+* {Jamie Quint}[https://github.com/jamiequint]
+* {Ryan Schmukler}[https://github.com/rschmukler]
