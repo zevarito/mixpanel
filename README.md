@@ -1,3 +1,5 @@
+[![Build Status](https://secure.travis-ci.org/zevarito/mixpanel.png)](http://travis-ci.org/zevarito/mixpanel)
+
 ## Table of Contents
 
 - [What is Mixpanel] (#what-is-mixpanel)
