@@ -75,7 +75,7 @@ Where **options** is a Hash that accepts the following keys:
 ### Initialize Mixpanel class
 
 ```ruby
-  @mixpanel = Mixpanel::Tracker.new("YOUR_MIXPANEL_API_TOKEN", request.env, true, options)
+  @mixpanel = Mixpanel::Tracker.new("YOUR_MIXPANEL_API_TOKEN", request.env, options)
 ```
 Where **options** is a Hash that accepts the following keys:
 
