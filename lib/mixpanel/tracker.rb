@@ -23,7 +23,7 @@ module Mixpanel
     end
 
     def track_event(event, properties = {})
-      options = { :time => Time.now.utc.to_i, :ip => ip }
+      options = {:time => Time.now.utc.to_i, :ip => ip}
       options.merge!( :token => @token ) if @token
       options.merge!(properties)
       params = build_event(event, options)
@@ -101,7 +101,7 @@ module Mixpanel
     end
 
     def build_event(event, properties)
-      { :event => event, :properties => properties }
+      {:event => event, :properties => properties}
     end
   end
 end
