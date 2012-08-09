@@ -193,13 +193,13 @@ All collaborations are welcome to this project, please fork and make a pull requ
 
 ## Collaborators and Maintainers
 
-* {Alvaro Gil}[https://github.com/zevarito] (Author)
-* {Nathan Baxter}[https://github.com/LogicWolfe]
-* {Jake Mallory}[https://github.com/tinomen]
-* {Logan Bowers}[https://github.com/loganb]
-* {jakemack}[https://github.com/jakemack]
-* {James Ferguson}[https://github.com/JamesFerguson]
-* {Brad Wilson}[https://github.com/bradx3]
-* {Mark Cheverton}[https://github.com/ennui2342]
-* {Jamie Quint}[https://github.com/jamiequint]
-* {Ryan Schmukler}[https://github.com/rschmukler]
+* [Alvaro Gil](https://github.com/zevarito) (Author)
+* [Nathan Baxter](https://github.com/LogicWolfe)
+* [Jake Mallory](https://github.com/tinomen)
+* [Logan Bowers](https://github.com/loganb)
+* [jakemack](https://github.com/jakemack)
+* [James Ferguson](https://github.com/JamesFerguson)
+* [Brad Wilson](https://github.com/bradx3)
+* [Mark Cheverton](https://github.com/ennui2342)
+* [Jamie Quint](https://github.com/jamiequint)
+* [Ryan Schmukler](https://github.com/rschmukler)
