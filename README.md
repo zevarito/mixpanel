@@ -11,6 +11,9 @@
 - [Examples] (#examples)
  - [How to use it from Rails controllers] (#how-to-use-it-from-rails-controllers)
  - [How to track events using Resque and Rails] (#how-to-track-events-using-resque-and-rails)
+ - [Supported Platforms] (#supported-platforms)
+ - [Deprecation Notes] (#deprecation-notes)
+ - [Collaborators and Maintainers] (#collaborators-and-maintainers)
 
 ## What is Mixpanel
 
@@ -175,6 +178,15 @@ async calls using Resque.
    end
 ```
 
+## Supported Platforms
+
+Rubies
+
+- 1.8.7
+- 1.9.2
+- 1.9.3
+- JRuby 1.8 Mode
+
 ## Deprecation Notes
 
 This way to initialize Mixpanel gem is not longer allowed. 
@@ -188,10 +200,6 @@ Use this instead:
 ```ruby
   Mixpanel::Tracker.new
 ```
-
-## Collaborations
-
-All collaborations are welcome to this project, please fork and make a pull request.
 
 ## Collaborators and Maintainers
 
