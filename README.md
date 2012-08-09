@@ -11,9 +11,9 @@
 - [Examples] (#examples)
  - [How to use it from Rails controllers] (#how-to-use-it-from-rails-controllers)
  - [How to track events using Resque and Rails] (#how-to-track-events-using-resque-and-rails)
- - [Supported Platforms] (#supported-platforms)
- - [Deprecation Notes] (#deprecation-notes)
- - [Collaborators and Maintainers] (#collaborators-and-maintainers)
+- [Supported Platforms] (#supported-platforms)
+- [Deprecation Notes] (#deprecation-notes)
+- [Collaborators and Maintainers] (#collaborators-and-maintainers)
 
 ## What is Mixpanel
 
@@ -179,8 +179,6 @@ async calls using Resque.
 ```
 
 ## Supported Platforms
-
-Rubies
 
 - 1.8.7
 - 1.9.2
