@@ -1,4 +1,4 @@
-files = ['README.rdoc', 'LICENSE', 'Rakefile', 'mixpanel.gemspec', '{spec,lib}/**/*'].map {|f| Dir[f]}.flatten
+files = ['README.md', 'LICENSE', 'Rakefile', 'mixpanel.gemspec', '{spec,lib}/**/*'].map {|f| Dir[f]}.flatten
 
 spec = Gem::Specification.new do |s|
   s.name = "mixpanel"
@@ -13,7 +13,7 @@ spec = Gem::Specification.new do |s|
   s.files = files
   s.require_path = "lib"
   s.has_rdoc = false
-  s.extra_rdoc_files = ["README.rdoc"]
+  s.extra_rdoc_files = ["README.md"]
   s.add_dependency 'json'
   s.add_dependency 'rack'
   s.add_dependency 'escape'
