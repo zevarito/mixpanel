@@ -1,3 +1,9 @@
+August 2012
+-------------
+* Added Javascript API 2 support (Jamie Quint)
+* Add persistence feature (Ryan Schmukler)
+* Deprecate: Mixpanel.new
+
 January 2012
 -------------
 * Ability to proxy Mixpanel calls (Mark Cheverton)
