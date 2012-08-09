@@ -6,12 +6,12 @@ require 'mixpanel/tracker/middleware'
 
 module Mixpanel
   class Tracker
-    def initialize(token, env, async = false, persist=false, url = 'http://api.mixpanel.com/track/?data=')
+    def initialize(token, env, options={})
       @token = token
       @env = env
-      @async = async
-      @url = url
-      @persist = persist
+      @async = options.fetch(:async, false)
+      @url = options.fetch(:url, 'http://api.mixpanel.com/track/?data=')
+      @persist = options.fetch(:persist, false)
 
       if @persist
         @env["rack.session"]["mixpanel_events"] ||= []
