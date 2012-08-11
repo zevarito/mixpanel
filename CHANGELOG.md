@@ -3,6 +3,7 @@ August 2012
 * Added Javascript API 2 support (Jamie Quint)
 * Add persistence feature (Ryan Schmukler)
 * Deprecate: Mixpanel.new
+* Use new JS CDN hosted (Alvaro Gil)
 
 January 2012
 -------------
