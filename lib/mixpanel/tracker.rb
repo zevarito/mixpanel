@@ -6,11 +6,14 @@ require 'mixpanel/tracker/middleware'
 
 module Mixpanel
   class Tracker
+    attr_accessor :distinct_id
+
     def initialize(token, env, options={})
       @token = token
       @env = env
       @async = options.fetch(:async, false)
       @url = options.fetch(:url, 'http://api.mixpanel.com/track/?data=')
+      @distinct_id = options.fetch(:distinct_id, nil)
       @persist = options.fetch(:persist, false)
 
       if @persist
@@ -48,6 +51,7 @@ module Mixpanel
     def track_event(event, properties = {})
       options = { :time => Time.now.utc.to_i, :ip => ip }
       options.merge!( :token => @token ) if @token
+      options.merge!( :distinct_id => @distinct_id ) if @distinct_id
       options.merge!(properties)
       params = build_event(event, options)
       parse_response request(params)
