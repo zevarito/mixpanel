@@ -106,6 +106,21 @@ Where **options** is a Hash that accepts the following keys:
   once.
   *To enable persistence*, you must set it in both places, Middleware and when you initialize Mixpanel class.
 
+* **distinct_id** : String
+
+  *Default: nil*.
+  Mixpanel may be provided with a 'distinct_id' value in order to tie events to a particular user. If this is
+  provided, each track_event request will automatically include the 'distict_id' value. This would typically
+  be the same identifier used on the front-end.
+
+  Example:
+
+```ruby
+  @mixpanel = Mixpanel::Tracker.new("TOKEN", request.env, {:distinct_id => "Unique Identifier"})
+  @mixpanel.append_api("identify", "Unique Identifier")
+  @mixpanel.track_event("Some Event") # Will now be tied to the user
+```
+
 ### Track events directly.
 
 ```ruby
