@@ -64,6 +64,8 @@ Where **options** is a Hash that accepts the following keys:
   once.
   *To enable persistence*, you must set it in both places, Middleware and when you initialize Mixpanel class.
 
+* **test_service_hostname** : Where to find a running instance of the <a href="https://github.com/johncant/mixpanel_test_service">mixpanel_test_service</a>, i.e. "localhost:3001". If defined, the mixpanel javascript API is hijacked to post all mixpanel events to the running mixpanel_test_service
+
 * **config** : a Hash
 
   *Default: {}*.

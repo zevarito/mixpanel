@@ -10,6 +10,7 @@ module Mixpanel
         @options = {
           :insert_js_last => false,
           :persist => false,
+          :test_service_hostname => nil,
           :config => {}
         }.merge(options)
       end
@@ -80,7 +81,7 @@ module Mixpanel
           <script type="text/javascript">
             (function(c,a){window.mixpanel=a;var b,d,h,e;b=c.createElement("script");
             b.type="text/javascript";b.async=!0;b.src=("https:"===c.location.protocol?"https:":"http:")+
-            '//cdn.mxpnl.com/libs/mixpanel-2.0.min.js';d=c.getElementsByTagName("script")[0];
+            '//#{@options[:test_service_hostname]||"cdn.mxpnl.com"}/libs/mixpanel-2.0.min.js';d=c.getElementsByTagName("script")[0];
             d.parentNode.insertBefore(b,d);a._i=[];a.init=function(b,c,f){function d(a,b){
             var c=b.split(".");2==c.length&&(a=a[c[0]],b=c[1]);a[b]=function(){a.push([b].concat(
             Array.prototype.slice.call(arguments,0)))}}var g=a;"undefined"!==typeof f?g=a[f]=[]:
