@@ -1,3 +1,8 @@
+September 2012
+--------------
+
+* Use mixpanel script version 2.1 (Travis Pew)
+
 August 2012
 -------------
 * Added Javascript API 2 support (Jamie Quint)
