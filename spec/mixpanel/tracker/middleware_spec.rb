@@ -31,7 +31,23 @@ describe Mixpanel::Tracker::Middleware do
       last_response.body.should == html_document
     end
   end
-
+  
+  describe "Dummy app, handles skip requests properly" do
+    before do
+      setup_rack_application(DummyApp, {:body => html_document, :headers => {"Content-Type" => "text/html"}})
+    end
+    
+    it "should not append mixpanel scripts with skip request" do
+      get "/", {}, {"HTTP_SKIP_MIXPANEL_MIDDLEWARE" => true}
+      Nokogiri::HTML(last_response.body).search('script').should be_empty
+    end
+    
+    it "should append mixpanel scripts without skip request" do
+      get "/"
+      Nokogiri::HTML(last_response.body).search('script').size.should == 1
+    end
+  end
+    
   describe "Appending async mixpanel scripts" do
     describe "With ajax requests" do
       before do
