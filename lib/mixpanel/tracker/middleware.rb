@@ -18,7 +18,7 @@ module Mixpanel
         @env = env
 
         @status, @headers, @response = @app.call(env)
-
+        
         if is_trackable_response?
           merge_queue! if @options[:persist]
           update_response!
@@ -71,6 +71,7 @@ module Mixpanel
 
       def is_trackable_response?
         return false if @status == 302
+        return false if @env.has_key?("HTTP_SKIP_MIXPANEL_MIDDLEWARE")
         is_html_response? || is_javascript_response?
       end
 
