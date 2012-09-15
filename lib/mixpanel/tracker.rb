@@ -8,9 +8,11 @@ module Mixpanel
   class Tracker
     def initialize(token, env, options={})
       @token = token
+      @api_key = options.fetch(:api_key, "")
       @env = env
       @async = options.fetch(:async, false)
-      @url = options.fetch(:url, 'http://api.mixpanel.com/track/?data=')
+      @import = options.fetch(:import, false)
+      @url = @import ? 'http://api.mixpanel.com/import/?data' : options.fetch(:url, 'http://api.mixpanel.com/track/?data=')
       @persist = options.fetch(:persist, false)
 
       if @persist
@@ -116,7 +118,7 @@ module Mixpanel
 
     def request(params)
       data = Base64.encode64(JSON.generate(params)).gsub(/\n/,'')
-      url = @url + data
+      url = @import ? @url + "=" + data + '&api_key=' + @api_key : @url + data
 
       if(@async)
         w = Tracker.worker

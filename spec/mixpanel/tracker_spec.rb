@@ -69,12 +69,12 @@ describe Mixpanel::Tracker do
         @mixpanel.append_event("Sign up", {:referer => 'http://example.com'})
         @mixpanel.queue.size.should == 1
       end
-      
+
       it "should provide direct access to the JS api" do
         @mixpanel.append_api('track', "Sign up", {:referer => 'http://example.com'})
         mixpanel_queue_should_include(@mixpanel, "track", "Sign up", {:referer => 'http://example.com'})
       end
-      
+
       it "should allow identify to be called through the JS api" do
         @mixpanel.append_api('identify', "some@one.com")
         mixpanel_queue_should_include(@mixpanel, "identify", "some@one.com")
@@ -84,32 +84,32 @@ describe Mixpanel::Tracker do
         @mixpanel.append_api('identify', "some@one.com")
         mixpanel_queue_should_include(@mixpanel, "identify", "some@one.com")
       end
-      
+
       it "should allow the tracking of super properties in JS" do
         @mixpanel.append_api('register', {:user_id => 12345, :email => "some@one.com"})
         mixpanel_queue_should_include(@mixpanel, 'register', {:user_id => 12345, :email => "some@one.com"})
       end
     end
   end
-  
+
   context "Accessing Mixpanel asynchronously" do
     it "should open a subprocess successfully" do
       w = Mixpanel::Tracker.worker
       w.should == Mixpanel::Tracker.worker
     end
-    
+
     it "should be able to write lines to the worker" do
       w = Mixpanel::Tracker.worker
-      
+
       #On most systems this will exceed the pipe buffer size
       8.times do
-        9000.times do 
+        9000.times do
           w.write("\n")
         end
         sleep 0.1
       end
     end
-    
+
     it "should dispose of a worker" do
       w = Mixpanel::Tracker.worker
       Mixpanel::Tracker.dispose_worker(w)
@@ -117,6 +117,13 @@ describe Mixpanel::Tracker do
       w.closed?.should == true
       w2 = Mixpanel::Tracker.worker
       w2.should_not == w
+    end
+  end
+
+  context "Import mode" do
+    it "should use the import URL" do
+      @mixpanel = Mixpanel::Tracker.new(MIX_PANEL_TOKEN, @env = {"REMOTE_ADDR" => "127.0.0.1"}, { :import => true, :api_key => "ABCDEFG" })
+      @mixpanel.inspect.to_s.include?("import/?data").should == true
     end
   end
 end
