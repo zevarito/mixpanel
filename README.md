@@ -67,6 +67,7 @@ Where **options** is a Hash that accepts the following keys:
 * **config** : a Hash
 
   *Default: {}*.
+
   You can also pass Mixpanel configuration details as seen here
   (https://mixpanel.com/docs/integration-libraries/javascript-full-api#set_config)
 
@@ -105,6 +106,10 @@ Where **options** is a Hash that accepts the following keys:
   This allows you to use a before filter to set these variables, redirect, and still have them only transmitted
   once.
   *To enable persistence*, you must set it in both places, Middleware and when you initialize Mixpanel class.
+
+  *To enable import mode* you must set both :import => true and :api_key => YOUR_KEY (not to be confused with the project token.)
+  You can get more information about import mode here
+  (https://mixpanel.com/docs/api-documentation/importing-events-older-than-31-days)
 
 ### Track events directly.
 
