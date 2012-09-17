@@ -217,3 +217,4 @@ Use this instead:
 * [Jamie Quint](https://github.com/jamiequint)
 * [Ryan Schmukler](https://github.com/rschmukler)
 * [Travis Pew](https://github.com/travisp)
+* [Sylvain Niles](https://github.com/sylvainsf)

@@ -1,6 +1,8 @@
 September 2012
 --------------
 
+* Added support for Import API (Sylvain Niles)
+* Ability to skip Mixpanel Middleware through HTTP custom header
 * Use mixpanel script version 2.1 (Travis Pew)
 
 August 2012
