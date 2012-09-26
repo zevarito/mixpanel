@@ -134,6 +134,20 @@ Where **options** is a Hash that accepts the following keys:
   @mixpanel.append_api("identify", "Unique Identifier")
 ```
 
+### Prevent middleware from inserting code
+*Note*: Only applies when [Rack Middleware](#rack-middleware) is setup.
+
+Occasionally you may need to send a request for HTML that you don't want the middleware to alter. In your AJAX request include the header "SKIP_MIXPANEL_MIDDLEWARE" to prevent the mixpanel code from being inserted.
+
+```javascript
+$.ajax("/path/to/api/endpoint", {
+	headers: {"SKIP_MIXPANEL_MIDDLEWARE": true},
+	success: function(data) {
+		// Process data here
+	}
+});
+```
+
 ## Examples
 
 ### How to use it from Rails controllers?
