@@ -11,8 +11,14 @@ module Mixpanel
       @api_key = options.fetch(:api_key, "")
       @env = env
       @async = options.fetch(:async, false)
-      @import = options.fetch(:import, false)
-      @url = @import ? 'http://api.mixpanel.com/import/?data' : options.fetch(:url, 'http://api.mixpanel.com/track/?data=')
+      @action = options.fetch(:action, :event)
+      raise unless [:import, :event, :person].include?(@action)
+      
+      @url = case @action
+      when :import then 'http://api.mixpanel.com/import/?data'
+      when :person then 'http://api.mixpanel.com/engage/?data='
+      when :event then options.fetch(:url, 'http://api.mixpanel.com/track/?data=')
+      end
       @persist = options.fetch(:persist, false)
 
       if @persist
@@ -52,6 +58,11 @@ module Mixpanel
       options.merge!( :token => @token ) if @token
       options.merge!(properties)
       params = build_event(event, options)
+      parse_response request(params)
+    end
+    
+    def update_person(id, action, properties={})
+      params = build_person(id, action, properties)
       parse_response request(params)
     end
 
@@ -118,7 +129,11 @@ module Mixpanel
 
     def request(params)
       data = Base64.encode64(JSON.generate(params)).gsub(/\n/,'')
-      url = @import ? @url + "=" + data + '&api_key=' + @api_key : @url + data
+      url = if @action == :import
+        @url + "=" + data + '&api_key=' + @api_key
+      else
+        @url + data
+      end
 
       if(@async)
         w = Tracker.worker
@@ -134,7 +149,14 @@ module Mixpanel
     end
 
     def build_event(event, properties)
+      raise if @action == :person
       {:event => event, :properties => properties}
+    end
+    
+    def build_person(id, action, params)
+      raise unless @action == :person
+      raise unless [:set, :add].include?(action)
+      { "$#{action}" => params, '$token' => @token, '$distinct_id' => id }
     end
   end
 end

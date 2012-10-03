@@ -122,8 +122,15 @@ describe Mixpanel::Tracker do
 
   context "Import mode" do
     it "should use the import URL" do
-      @mixpanel = Mixpanel::Tracker.new(MIX_PANEL_TOKEN, @env = {"REMOTE_ADDR" => "127.0.0.1"}, { :import => true, :api_key => "ABCDEFG" })
+      @mixpanel = Mixpanel::Tracker.new(MIX_PANEL_TOKEN, @env = {"REMOTE_ADDR" => "127.0.0.1"}, { :action => :import, :api_key => "ABCDEFG" })
       @mixpanel.inspect.to_s.include?("import/?data").should == true
+    end
+  end
+  
+  context "Person mode" do
+    it "should use the person URL" do
+      @mixpanel = Mixpanel::Tracker.new(MIX_PANEL_TOKEN, @env = {"REMOTE_ADDR" => "127.0.0.1"}, { :action => :person, :api_key => "ABCDEFG" })
+      @mixpanel.inspect.to_s.include?("engage/?data").should == true
     end
   end
 end
