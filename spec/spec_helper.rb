@@ -6,7 +6,7 @@ require 'nokogiri'
 Dir[File.expand_path(File.join(File.dirname(__FILE__),'support','**','*.rb'))].each {|f| require f}
 
 MIX_PANEL_TOKEN = "e2d8b0bea559147844ffab3d607d26a6"
-
+DISTINCT_ID     = "abcd1234"
 
 def mixpanel_queue_should_include(mixpanel, type, *arguments)
   mixpanel.queue.each do |event_type, event_arguments|
