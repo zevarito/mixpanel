@@ -90,10 +90,10 @@ Where **options** is a Hash that accepts the following keys:
 
 * **url** : String
  
-  *Default: http://api.mixpanel.com/track/?data=*.
+  *Default: http://api.mixpanel.com*.
   If you are proxying Mixpanel API requests then you can set a custom url and additionally stop the token from
   being sent by marking it as false if you're going to let the proxy add it.
-  Example: { url: "http://localhost:8000/mixpanelproxy?data=" }.
+  Example: { url: "http://localhost:8000/mixpanelproxy" }.
 
 * **persist** : true | false
 
@@ -115,6 +115,13 @@ Where **options** is a Hash that accepts the following keys:
 
 ```ruby
   @mixpanel.track_event("Sign in", {:some => "property"})
+```
+
+### Interface with People management directly
+
+```ruby
+  @mixpanel.engage_set(@user.id, {:username => @user.username, :email => @user.email})
+  @mixpanel.engage_add(@user.id, {:monkeys_punched => 12})
 ```
 
 ### Append events to be tracked with Javascript.

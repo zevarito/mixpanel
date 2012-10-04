@@ -6,14 +6,22 @@ require 'mixpanel/tracker/middleware'
 
 module Mixpanel
   class Tracker
-    def initialize(token, env, options={})
-      @token = token
-      @api_key = options.fetch(:api_key, "")
-      @env = env
-      @async = options.fetch(:async, false)
-      @import = options.fetch(:import, false)
-      @url = @import ? 'http://api.mixpanel.com/import/?data' : options.fetch(:url, 'http://api.mixpanel.com/track/?data=')
-      @persist = options.fetch(:persist, false)
+    
+    MIXPANEL_API_URL  = 'http://api.mixpanel.com'.freeze
+    TRACK_ENDPOINT    = '/track/?data='.freeze
+    ENGAGE_ENDPOINT   = '/engage/?data='.freeze
+    IMPORT_ENDPOINT   = '/import/?data='.freeze
+    
+    PERSON_PROPERTIES = %w(email first_name last_name created last_login username country_code).freeze
+    
+    def initialize(token, env, options = {})
+      @token    = token
+      @api_key  = options.fetch(:api_key, "")
+      @env      = env
+      @async    = options.fetch(:async, false)
+      @import   = options.fetch(:import, false)
+      @url      = options.fetch(:url, MIXPANEL_API_URL)
+      @persist  = options.fetch(:persist, false)
 
       if @persist
         @env["rack.session"]["mixpanel_events"] ||= []
@@ -27,16 +35,7 @@ module Mixpanel
     end
 
     def append_person_event(properties = {})
-      # evaluate symbols and rewrite
-      special_properties = %w{email created first_name last_name last_login username country_code}
-      special_properties.each do |key|
-        symbolized_key = key.to_sym
-        if properties.has_key?(symbolized_key)
-          properties["$#{key}"] = properties[symbolized_key]
-          properties.delete(symbolized_key)
-        end
-      end
-      append_api('people.set', properties)
+      append_api('people.set', person_properties(properties))
     end
 
     def append_person_increment_event(property, increment=1)
@@ -50,11 +49,29 @@ module Mixpanel
     def track_event(event, properties = {})
       options = { :time => Time.now.utc.to_i, :ip => ip }
       options.merge!( :token => @token ) if @token
-      options.merge!(properties)
-      params = build_event(event, options)
-      parse_response request(params)
+      parse_response request(:track,
+        :event      => event,
+        :properties => options.merge(properties)
+      )
     end
-
+    
+    def engage(action, distinct_id, properties = {})
+      options = { }
+      options.merge!( :$token => @token ) if @token
+      parse_response request(:engage, options.merge(
+        :$distinct_id       => distinct_id, 
+        "$#{action}".to_sym => person_properties(properties)
+      ))
+    end
+    
+    def engage_set(distinct_id, properties = {})
+      engage(:set, distinct_id, properties)
+    end
+    
+    def engage_add(distinct_id, properties = {})
+      engage(:add, distinct_id, properties)
+    end
+    
     def ip
       if @env.has_key?("HTTP_X_FORWARDED_FOR")
         @env["HTTP_X_FORWARDED_FOR"].split(",").last
@@ -81,7 +98,7 @@ module Mixpanel
       end
     end
 
-    class <<self
+    class << self
       WORKER_MUTEX = Mutex.new
 
       def worker
@@ -111,15 +128,34 @@ module Mixpanel
     end
 
     private
+    
+    def person_properties(properties = {})
+      properties.inject({}) do |out, (k, v)|
+        if PERSON_PROPERTIES.member?(k.to_s)
+          out["$#{k}".to_sym] = v
+        else
+          out[k] = v
+        end
+        out
+      end
+    end
 
     def parse_response(response)
       response == "1" ? true : false
     end
 
-    def request(params)
+    def request(mode, params)
       data = Base64.encode64(JSON.generate(params)).gsub(/\n/,'')
-      url = @import ? @url + "=" + data + '&api_key=' + @api_key : @url + data
-
+      
+      mode = :import if @import
+      endpoint = case mode
+        when :track   then TRACK_ENDPOINT
+        when :engage  then ENGAGE_ENDPOINT
+        when :import  then IMPORT_ENDPOINT
+      end
+      url = "#{@url}#{endpoint}#{data}"
+      url += "&api_key=#{@api_key}" if mode == :import
+      
       if(@async)
         w = Tracker.worker
         begin
@@ -131,10 +167,6 @@ module Mixpanel
       else
         open(url).read
       end
-    end
-
-    def build_event(event, properties)
-      {:event => event, :properties => properties}
     end
   end
 end

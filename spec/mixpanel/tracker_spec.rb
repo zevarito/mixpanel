@@ -29,7 +29,7 @@ describe Mixpanel::Tracker do
       it "should call request method with token, time value and ip address" do
         params = {:event => "Sign up", :properties => {:token => MIX_PANEL_TOKEN, :time => Time.now.utc.to_i, :ip => "127.0.0.1"}}
 
-        @mixpanel.should_receive(:request).with(params).and_return("1")
+        @mixpanel.should_receive(:request).with(:track, params).and_return("1")
         @mixpanel.track_event("Sign up").should == true
       end
 
@@ -38,8 +38,45 @@ describe Mixpanel::Tracker do
 
         params = {:event => "Sign up", :properties => {:token => MIX_PANEL_TOKEN, :time => Time.now.utc.to_i, :ip => "10.1.0.2"}}
 
-        @mixpanel.should_receive(:request).with(params).and_return("1")
+        @mixpanel.should_receive(:request).with(:track, params).and_return("1")
         @mixpanel.track_event("Sign up")
+      end
+    end
+    
+    context "Managing People" do
+      it "should set person data" do
+        @mixpanel.engage_set(DISTINCT_ID, :$email => 'test@example.com').should == true
+      end
+      
+      it "should add person data" do
+        @mixpanel.engage_add(DISTINCT_ID, :custom => 99).should == true
+      end
+      
+      it "should be able to call engage method directly" do
+        @mixpanel.engage(:set, DISTINCT_ID, :$email => 'test@example.com').should == true
+      end
+      
+      it "should call request method for setting" do
+        params = {
+          :$token       => MIX_PANEL_TOKEN,
+          :$distinct_id => DISTINCT_ID,
+          :$set         => {
+            :$email => 'test@example.com',
+            :custom => 'test'
+        }}
+        @mixpanel.should_receive(:request).with(:engage, params).and_return("1")
+        @mixpanel.engage(:set, DISTINCT_ID, :email => 'test@example.com', :custom => 'test')
+      end
+      
+      it "should call request method for adding" do
+        params = {
+          :$token       => MIX_PANEL_TOKEN,
+          :$distinct_id => DISTINCT_ID,
+          :$add         => {
+            :custom => 99
+        }}
+        @mixpanel.should_receive(:request).with(:engage, params).and_return("1")
+        @mixpanel.engage(:add, DISTINCT_ID, :custom => 99)
       end
     end
   end
@@ -120,10 +157,23 @@ describe Mixpanel::Tracker do
     end
   end
 
-  context "Import mode" do
+  context "Request modes" do
+    it "should use the track URL" do
+      @mixpanel.track_event("Sign up")
+      FakeWeb.last_request.path.to_s.include?(Mixpanel::Tracker::TRACK_ENDPOINT).should == true
+    end
+    
+    it "should use the engage URL" do
+      @mixpanel.engage(:set, DISTINCT_ID, :email => 'test@example.com')
+      FakeWeb.last_request.path.to_s.include?(Mixpanel::Tracker::ENGAGE_ENDPOINT).should == true
+    end
+    
     it "should use the import URL" do
       @mixpanel = Mixpanel::Tracker.new(MIX_PANEL_TOKEN, @env = {"REMOTE_ADDR" => "127.0.0.1"}, { :import => true, :api_key => "ABCDEFG" })
-      @mixpanel.inspect.to_s.include?("import/?data").should == true
+      @mixpanel.track_event("Sign up")
+      path = FakeWeb.last_request.path.to_s
+      path.include?(Mixpanel::Tracker::IMPORT_ENDPOINT).should == true
+      path.include?("&api_key=ABCDEFG").should == true
     end
   end
 end
