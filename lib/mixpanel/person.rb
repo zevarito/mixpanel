@@ -1,4 +1,4 @@
-module Person
+module Mixpanel::Person
   PERSON_PROPERTIES = %w{email created first_name last_name last_login username country_code}
   PERSON_URL = 'http://api.mixpanel.com/engage/'
   
@@ -16,6 +16,14 @@ module Person
   
   def append_increment property, increment=1
     append 'people.increment', property, increment
+  end
+  
+  def append_register properties={}
+    append 'register', properties_hash(properties, PERSON_PROPERTIES)
+  end
+  
+  def append_identify distinct_id
+    append 'identify', distinct_id
   end
   
   protected

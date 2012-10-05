@@ -1,15 +1,20 @@
 require 'spec_helper'
+require 'mixpanel/middleware'
+require 'active_support/core_ext/hash'
 
 def exec_default_appends_on(mixpanel)
-  mixpanel.append_event("Visit", {:article => 1})
-  mixpanel.append_event("Sign in")
-  mixpanel.append_person_event(:first_name => "foo", :last_name => "bar", :username => "foobar")
-  mixpanel.append_person_increment_event(:sign_in_rate)
+  mixpanel.append_track("Visit", {:article => 1})
+  mixpanel.append_track("Sign in")
+  mixpanel.append_set(:first_name => "foo", :last_name => "bar", :username => "foobar")
+  mixpanel.append_increment(:sign_in_rate)
 end
 
 def check_for_default_appends_on(txt)
-  txt.should =~ /mixpanel\.track\("Visit",\s?\{"article":1\}\)/
-  txt.should =~ /mixpanel\.track\("Sign in",\s?\{\}\)/
+  # puts "TEXT:\n\n"
+  # puts txt
+  # puts "\n\n"
+  txt.should =~ /mixpanel\.track\("Visit",\s?\{"article":1,"time":/
+  txt.should =~ /mixpanel\.track\("Sign in",\s?\{"time":/
   txt.should =~ /mixpanel\.people\.set\(.*\);\nmixpanel.people.increment\(\"sign_in_rate\",\s?1\);/
   match = txt.match(/mixpanel\.people\.set\((.*\));/)
   match[1].should =~ /\"\$first_name\":\"foo\"/
@@ -18,9 +23,9 @@ def check_for_default_appends_on(txt)
   txt.should =~ /mixpanel\.people\.increment\(\"sign_in_rate\"\s?,\s?1\)/
 end
 
-describe Mixpanel::Tracker::Middleware do
+describe Mixpanel::Middleware do
   include Rack::Test::Methods
-
+  
   describe "Dummy apps, no text/html" do
     before do
       setup_rack_application(DummyApp, :body => html_document, :headers => {})
@@ -198,7 +203,7 @@ describe Mixpanel::Tracker::Middleware do
 
   describe "Tracking async appended events" do
     before do
-      @mixpanel = Mixpanel::Tracker.new(MIX_PANEL_TOKEN, {})
+      @mixpanel = Mixpanel.new(MIX_PANEL_TOKEN, {})
       exec_default_appends_on @mixpanel
     end
 
@@ -266,7 +271,7 @@ describe Mixpanel::Tracker::Middleware do
 
   describe "Tracking appended events" do
     before do
-      @mixpanel = Mixpanel::Tracker.new(MIX_PANEL_TOKEN, {})
+      @mixpanel = Mixpanel.new(MIX_PANEL_TOKEN, {})
       exec_default_appends_on @mixpanel
     end
 
