@@ -12,6 +12,14 @@ class Mixpanel
   def initialize token, options={}
     @token = token
     @async = options.fetch(:async, false)
+    @persist = options.fetch(:persist, false)
+    @env = options.fetch(:env, {})
+    
+    if @persist
+      queue ||= []
+    else
+      clear_queue
+    end
   end
   
   protected
@@ -38,5 +46,17 @@ class Mixpanel
   
   def parse_response response
     response.to_i == 1
+  end
+  
+  def queue
+    @persist ? @env["rack.session"]["mixpanel_events"] : @env["mixpanel_events"]
+  end
+  
+  def clear_queue
+    queue = []
+  end
+  
+  def append type, *args
+    queue << [type, args.collect {|arg| arg.to_json}]
   end
 end

@@ -10,6 +10,14 @@ module Person
     engage :add, distinct_id, properties, options
   end
   
+  def append_set properties={}
+    append 'people.set', properties_hash(properties, PERSON_PROPERTIES)
+  end
+  
+  def append_increment property, increment=1
+    append 'people.increment', property, increment
+  end
+  
   protected
   
   def engage action, distinct_id, properties, options
