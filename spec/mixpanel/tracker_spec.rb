@@ -1,5 +1,4 @@
 require 'spec_helper'
-require 'active_support/core_ext/hash'
 
 describe Mixpanel::Tracker do
   before(:each) do

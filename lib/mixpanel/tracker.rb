@@ -65,8 +65,10 @@ module Mixpanel
       begin
         url << "\n"
         w.write url
+        1
       rescue Errno::EPIPE => e
         Mixpanel::Tracker.dispose_worker w
+        0
       end
     end
   end

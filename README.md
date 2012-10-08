@@ -7,7 +7,7 @@
 - [Install] (#install)
   - [Rack Middleware] (#rack-middleware) 
 - [Usage] (#usage)
-  - [Initialize Mixpanel class] (#initialize-mixpanel-class) 
+  - [Initialize Mixpanel] (#initialize-mixpanel)
 	- [Track Events Directly](#track-events-directly)
 	- [Import Events](#import-events)
 	- [Set Person Attributes Directly](#set-person-attributes-directly)
@@ -84,7 +84,7 @@ Where **options** is a hash that accepts the following keys:
 
 ## Usage
 
-### Initialize Mixpanel Class
+### Initialize Mixpanel
 
 ```ruby
   @mixpanel = Mixpanel::Tracker.new YOUR_MIXPANEL_API_TOKEN, options
