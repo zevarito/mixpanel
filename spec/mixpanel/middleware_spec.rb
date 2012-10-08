@@ -203,7 +203,7 @@ describe Mixpanel::Middleware do
 
   describe "Tracking async appended events" do
     before do
-      @mixpanel = Mixpanel.new(MIX_PANEL_TOKEN, {})
+      @mixpanel = Mixpanel::Tracker.new MIX_PANEL_TOKEN
       exec_default_appends_on @mixpanel
     end
 
@@ -271,7 +271,7 @@ describe Mixpanel::Middleware do
 
   describe "Tracking appended events" do
     before do
-      @mixpanel = Mixpanel.new(MIX_PANEL_TOKEN, {})
+      @mixpanel = Mixpanel::Tracker.new MIX_PANEL_TOKEN
       exec_default_appends_on @mixpanel
     end
 

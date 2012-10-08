@@ -1,7 +1,7 @@
 require 'rack'
 require 'json'
 
-class Mixpanel
+module Mixpanel
   class Middleware
     def initialize(app, mixpanel_token, options={})
       @app = app

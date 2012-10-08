@@ -87,7 +87,7 @@ Where **options** is a hash that accepts the following keys:
 ### Initialize Mixpanel Class
 
 ```ruby
-  @mixpanel = Mixpanel.new YOUR_MIXPANEL_API_TOKEN, options
+  @mixpanel = Mixpanel::Tracker.new YOUR_MIXPANEL_API_TOKEN, options
 ```
 Where **options** is a hash that accepts the following keys:
 
@@ -145,7 +145,7 @@ Where **options** is a hash that accepts the following keys:
     'rack.session' => request.env['rack.session'],
     'mixpanel_events' => request.env['mixpanel_events']
   }
-	@mixpanel = Mixpanel.new MIXPANEL_TOKEN, { :env => env }
+	@mixpanel = Mixpanel::Tracker.new MIXPANEL_TOKEN, { :env => env }
 	```
 	
 	Basically, this information is being used to: set the default IP address associated with the request, and grab any session variables
@@ -290,7 +290,7 @@ In your ApplicationController class add a method to keep track of a Mixpanel ins
 ```ruby
 protected
 def mixpanel
-	@mixpanel ||= Mixpanel.new YOUR_MIXPANEL_API_TOKEN, { :env => request.env }
+	@mixpanel ||= Mixpanel::Tracker.new YOUR_MIXPANEL_API_TOKEN, { :env => request.env }
 end
 ```
 
@@ -314,7 +314,7 @@ class MixpanelTrackEventJob
 	@queue = :slow
 
 	def self.mixpanel env
-		Mixpanel.new MIXPANEL_TOKEN, { :env => env }
+		Mixpanel::Tracker.new MIXPANEL_TOKEN, { :env => env }
 	end
 
 	def self.perform name, properties, env

@@ -1,9 +1,9 @@
 require 'spec_helper'
 require 'active_support/core_ext/hash'
 
-describe Mixpanel do
+describe Mixpanel::Tracker do
   before(:each) do
-    @mixpanel = Mixpanel.new MIX_PANEL_TOKEN, { :env => {"REMOTE_ADDR" => "127.0.0.1"} }
+    @mixpanel = Mixpanel::Tracker.new MIX_PANEL_TOKEN, { :env => {"REMOTE_ADDR" => "127.0.0.1"} }
   end
 
   context "Initializing object" do
@@ -95,12 +95,12 @@ describe Mixpanel do
 
   context "Accessing Mixpanel asynchronously" do
     it "should open a subprocess successfully" do
-      w = Mixpanel.worker
-      w.should == Mixpanel.worker
+      w = Mixpanel::Tracker.worker
+      w.should == Mixpanel::Tracker.worker
     end
 
     it "should be able to write lines to the worker" do
-      w = Mixpanel.worker
+      w = Mixpanel::Tracker.worker
 
       #On most systems this will exceed the pipe buffer size
       8.times do
@@ -112,11 +112,11 @@ describe Mixpanel do
     end
 
     it "should dispose of a worker" do
-      w = Mixpanel.worker
-      Mixpanel.dispose_worker(w)
+      w = Mixpanel::Tracker.worker
+      Mixpanel::Tracker.dispose_worker(w)
 
       w.closed?.should == true
-      w2 = Mixpanel.worker
+      w2 = Mixpanel::Tracker.worker
       w2.should_not == w
     end
   end
