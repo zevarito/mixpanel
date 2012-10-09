@@ -13,7 +13,7 @@ module Mixpanel
     include Mixpanel::Event
     include Mixpanel::Person
   
-    def initialize token, options={}
+    def initialize(token, options={})
       @token = token
       @async = !!options.fetch(:async, false)
       @persist = !!options.fetch(:persist, false)
@@ -33,14 +33,14 @@ module Mixpanel
       @persist ? @env['rack.session']['mixpanel_events'] : @env['mixpanel_events']
     end
   
-    def append type, *args
+    def append(type, *args)
       queue << [type, args.collect {|arg| arg.to_json}]
     end
   
     protected
   
     # Walk through each property and see if it is in the special_properties.  If so, change the key to have a $ in front of it.
-    def properties_hash properties, special_properties
+    def properties_hash(properties, special_properties)
       properties.inject({}) do |props, (key, value)|
         key = "$#{key}" if special_properties.include?(key.to_s)
         props[key.to_sym] = value
@@ -48,19 +48,19 @@ module Mixpanel
       end
     end
   
-    def encoded_data parameters
+    def encoded_data(parameters)
       Base64.encode64(JSON.generate(parameters)).gsub(/\n/,'')
     end
   
-    def request url, async
+    def request(url, async)
       async ? send_async(url) : open(url).read
     end
   
-    def parse_response response
+    def parse_response(response)
       response.to_i == 1
     end
   
-    def send_async url
+    def send_async(url)
       w = Mixpanel::Tracker.worker
       begin
         url << "\n"
