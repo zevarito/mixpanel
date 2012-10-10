@@ -9,8 +9,8 @@ def exec_default_appends_on(mixpanel)
 end
 
 def check_for_default_appends_on(txt)
-  txt.should =~ /mixpanel\.track\("Visit",\s?\{"article":1,"time":/
-  txt.should =~ /mixpanel\.track\("Sign in",\s?\{"time":/
+  txt.should =~ /mixpanel\.track\("Visit",\s?\{.*"article":1[\{|,]/
+  txt.should =~ /mixpanel\.track\("Sign in",\s?\{.*"time":.*\}/
   txt.should =~ /mixpanel\.people\.set\(.*\);\nmixpanel.people.increment\(\"sign_in_rate\",\s?1\);/
   match = txt.match(/mixpanel\.people\.set\((.*\));/)
   match[1].should =~ /\"\$first_name\":\"foo\"/
