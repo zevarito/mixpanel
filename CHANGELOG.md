@@ -2,6 +2,7 @@ October 2012
 --------------
 
 * Engage endpoint added. (GBH)
+* Code revision (Chris Sturgill)
 
 September 2012
 --------------
