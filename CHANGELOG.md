@@ -1,3 +1,8 @@
+October 2012
+--------------
+
+* Engage endpoint added. (GBH)
+
 September 2012
 --------------
 

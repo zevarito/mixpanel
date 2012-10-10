@@ -1,4 +1,4 @@
-[![Build Status](https://secure.travis-ci.org/zevarito/mixpanel.png)](http://travis-ci.org/zevarito/mixpanel)
+[![Build Status](https://secure.travis-ci.org/zevarito/mixpanel.png?branch=master)](http://travis-ci.org/zevarito/mixpanel)
 
 ## Table of Contents
 
@@ -366,4 +366,5 @@ end
 * [Ryan Schmukler](https://github.com/rschmukler)
 * [Travis Pew](https://github.com/travisp)
 * [Sylvain Niles](https://github.com/sylvainsf)
+* [GBH](https://github.com/GBH)
 * [Goalee](https://github.com/Goalee)
