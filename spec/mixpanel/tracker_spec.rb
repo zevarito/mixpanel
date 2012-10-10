@@ -2,20 +2,20 @@ require 'spec_helper'
 
 describe Mixpanel::Tracker do
   before(:each) do
-    @mixpanel = Mixpanel::Tracker.new(MIX_PANEL_TOKEN, @env = {"REMOTE_ADDR" => "127.0.0.1"})
+    @mixpanel = Mixpanel::Tracker.new MIX_PANEL_TOKEN, { :env => {"REMOTE_ADDR" => "127.0.0.1"} }
   end
 
   context "Initializing object" do
     it "should have an instance variable for token and events" do
-      @mixpanel.instance_variables.map(&:to_s).should include("@token", "@env")
+      @mixpanel.instance_variables.map(&:to_s).should include('@token', '@async', '@persist', '@env')
     end
   end
 
   context "Cleaning appended events" do
     it "should clear the queue" do
-      @mixpanel.append_event("Sign up")
+      @mixpanel.append_track("Sign up")
       @mixpanel.queue.size.should == 1
-      @mixpanel.clear_queue
+      @mixpanel.queue.clear
       @mixpanel.queue.size.should == 0
     end
   end
@@ -23,60 +23,31 @@ describe Mixpanel::Tracker do
   context "Accessing Mixpanel through direct request" do
     context "Tracking events" do
       it "should track simple events" do
-        @mixpanel.track_event("Sign up").should == true
+        @mixpanel.track("Sign up").should == true
       end
-
-      it "should call request method with token, time value and ip address" do
-        params = {:event => "Sign up", :properties => {:token => MIX_PANEL_TOKEN, :time => Time.now.utc.to_i, :ip => "127.0.0.1"}}
-
-        @mixpanel.should_receive(:request).with(:track, params).and_return("1")
-        @mixpanel.track_event("Sign up").should == true
-      end
-
-      it "should call request method with token, and send ip address from HTTP_X_FORWARDED_FOR" do
-        @mixpanel = Mixpanel::Tracker.new(MIX_PANEL_TOKEN, @env = {"HTTP_X_FORWARDED_FOR" => "10.1.0.2"})
-
-        params = {:event => "Sign up", :properties => {:token => MIX_PANEL_TOKEN, :time => Time.now.utc.to_i, :ip => "10.1.0.2"}}
-
-        @mixpanel.should_receive(:request).with(:track, params).and_return("1")
-        @mixpanel.track_event("Sign up")
+      
+      it "should track events with properties" do
+        @mixpanel.track('Sign up', { :likeable => true }, { :api_key => 'asdf' }).should == true
       end
     end
     
-    context "Managing People" do
-      it "should set person data" do
-        @mixpanel.engage_set(DISTINCT_ID, :$email => 'test@example.com').should == true
+    context "Importing events" do
+      it "should import simple events" do
+        @mixpanel.import('Sign up').should == true
       end
       
-      it "should add person data" do
-        @mixpanel.engage_add(DISTINCT_ID, :custom => 99).should == true
+      it "should import events with properties" do
+        @mixpanel.import('Sign up', { :likeable => true }, { :api_key => 'asdf' }).should == true
+      end
+    end
+    
+    context "Engaging people" do
+      it "should set attributes" do
+        @mixpanel.set('person-a', { :email => 'me@domain.com', :likeable => false }).should == true
       end
       
-      it "should be able to call engage method directly" do
-        @mixpanel.engage(:set, DISTINCT_ID, :$email => 'test@example.com').should == true
-      end
-      
-      it "should call request method for setting" do
-        params = {
-          :$token       => MIX_PANEL_TOKEN,
-          :$distinct_id => DISTINCT_ID,
-          :$set         => {
-            :$email => 'test@example.com',
-            :custom => 'test'
-        }}
-        @mixpanel.should_receive(:request).with(:engage, params).and_return("1")
-        @mixpanel.engage(:set, DISTINCT_ID, :email => 'test@example.com', :custom => 'test')
-      end
-      
-      it "should call request method for adding" do
-        params = {
-          :$token       => MIX_PANEL_TOKEN,
-          :$distinct_id => DISTINCT_ID,
-          :$add         => {
-            :custom => 99
-        }}
-        @mixpanel.should_receive(:request).with(:engage, params).and_return("1")
-        @mixpanel.engage(:add, DISTINCT_ID, :custom => 99)
+      it "should increment attributes" do
+        @mixpanel.increment('person-a', { :tokens => 3, :money => -1 }).should == true
       end
     end
   end
@@ -84,47 +55,39 @@ describe Mixpanel::Tracker do
   context "Accessing Mixpanel through javascript API" do
     context "Appending events" do
       it "should store the event under the appropriate key" do
-        @mixpanel.append_event("Sign up")
-        @env.has_key?("mixpanel_events").should == true
+        @mixpanel.instance_variable_get(:@env).has_key?("mixpanel_events").should == true
       end
 
       it "should be the same the queue than env['mixpanel_events']" do
-        @env['mixpanel_events'].object_id.should == @mixpanel.queue.object_id
+        @mixpanel.instance_variable_get(:@env)['mixpanel_events'].object_id.should == @mixpanel.queue.object_id
       end
 
       it "should append simple events" do
-        @mixpanel.append_event("Sign up")
-        mixpanel_queue_should_include(@mixpanel, "track", "Sign up", {})
+        props = { :time => Time.now, :ip => 'ASDF' }
+        @mixpanel.append_track "Sign up", props
+        mixpanel_queue_should_include(@mixpanel, "track", "Sign up", props)
       end
 
       it "should append events with properties" do
-        @mixpanel.append_event("Sign up", {:referer => 'http://example.com'})
-        mixpanel_queue_should_include(@mixpanel, "track", "Sign up", {:referer => 'http://example.com'})
+        props = { :referer => 'http://example.com', :time => Time.now, :ip => 'ASDF' }
+        @mixpanel.append_track "Sign up", props
+        mixpanel_queue_should_include(@mixpanel, "track", "Sign up", props)
       end
 
       it "should give direct access to queue" do
-        @mixpanel.append_event("Sign up", {:referer => 'http://example.com'})
+        @mixpanel.append_track("Sign up", {:referer => 'http://example.com'})
         @mixpanel.queue.size.should == 1
       end
 
-      it "should provide direct access to the JS api" do
-        @mixpanel.append_api('track', "Sign up", {:referer => 'http://example.com'})
-        mixpanel_queue_should_include(@mixpanel, "track", "Sign up", {:referer => 'http://example.com'})
-      end
-
       it "should allow identify to be called through the JS api" do
-        @mixpanel.append_api('identify', "some@one.com")
-        mixpanel_queue_should_include(@mixpanel, "identify", "some@one.com")
-      end
-
-      it "should allow identify to be called through the JS api" do
-        @mixpanel.append_api('identify', "some@one.com")
+        @mixpanel.append_identify "some@one.com"
         mixpanel_queue_should_include(@mixpanel, "identify", "some@one.com")
       end
 
       it "should allow the tracking of super properties in JS" do
-        @mixpanel.append_api('register', {:user_id => 12345, :email => "some@one.com"})
-        mixpanel_queue_should_include(@mixpanel, 'register', {:user_id => 12345, :email => "some@one.com"})
+        props = {:user_id => 12345, :gender => 'male'}
+        @mixpanel.append_register props
+        mixpanel_queue_should_include(@mixpanel, 'register', props)
       end
     end
   end
@@ -154,26 +117,6 @@ describe Mixpanel::Tracker do
       w.closed?.should == true
       w2 = Mixpanel::Tracker.worker
       w2.should_not == w
-    end
-  end
-
-  context "Request modes" do
-    it "should use the track URL" do
-      @mixpanel.track_event("Sign up")
-      FakeWeb.last_request.path.to_s.include?(Mixpanel::Tracker::TRACK_ENDPOINT).should == true
-    end
-    
-    it "should use the engage URL" do
-      @mixpanel.engage(:set, DISTINCT_ID, :email => 'test@example.com')
-      FakeWeb.last_request.path.to_s.include?(Mixpanel::Tracker::ENGAGE_ENDPOINT).should == true
-    end
-    
-    it "should use the import URL" do
-      @mixpanel = Mixpanel::Tracker.new(MIX_PANEL_TOKEN, @env = {"REMOTE_ADDR" => "127.0.0.1"}, { :import => true, :api_key => "ABCDEFG" })
-      @mixpanel.track_event("Sign up")
-      path = FakeWeb.last_request.path.to_s
-      path.include?(Mixpanel::Tracker::IMPORT_ENDPOINT).should == true
-      path.include?("&api_key=ABCDEFG").should == true
     end
   end
 end
