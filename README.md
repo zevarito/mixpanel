@@ -7,7 +7,11 @@
 - [Install] (#install)
   - [Rack Middleware] (#rack-middleware) 
 - [Usage] (#usage)
-  - [Initialize Mixpanel class] (#initialize-mixpanel-class) 
+  - [Initialize Mixpanel] (#initialize-mixpanel)
+	- [Track Events Directly](#track-events-directly)
+	- [Import Events](#import-events)
+	- [Set Person Attributes Directly](#set-person-attributes-directly)
+	- [Increment Person Attributes Directly](#increment-person-attributes-directly)
 - [Examples] (#examples)
  - [How to use it from Rails controllers] (#how-to-use-it-from-rails-controllers)
  - [How to track events using Resque and Rails] (#how-to-track-events-using-resque-and-rails)
@@ -22,8 +26,10 @@ http://mixpanel.com
 
 ## What does this Gem do?
 
-- Track events with properties directly from your backend.
-- Track events with properties through javascript using a rack middleware.
+- Track events with properties directly from your backend
+- Track events with properties through JavaScript using a Rack Middleware
+- Set / increment user attributes directly from your backend
+- Set / increment user attributes through JavaScript using a Rack Middleware
 
 ## Install
 
@@ -33,112 +39,232 @@ http://mixpanel.com
 
 ### Rack Middleware
 
-*Only need if you want to track events from Javascript.*
+*Only needed if you want to track events via Javascript.*  This setup will allow your backend to have the client browser process the actual
+requests over JavaScript rather than sending the request yourself.
 
 If you are using Rails you can add this to your specific environment configuration file (located in config/environments/) or create a new
 initializer for it:
 
 ```ruby
-  config.middleware.use "Mixpanel::Tracker::Middleware", "YOUR_MIXPANEL_API_TOKEN", options
+  config.middleware.use "Mixpanel::Middleware", "YOUR_MIXPANEL_API_TOKEN", options
 ```
 
-Where **options** is a Hash that accepts the following keys:
+Where **options** is a hash that accepts the following keys:
 
-* **insert_js_last** : true | false
+* **insert_js_last** : boolean
 
-  *Default: false*.
-  By default the scripts are inserted into the head of the html response. If you'd prefer the scripts to run after
-  all rendering has completed you can set the insert_js_last flag and they'll be added at the end of the body tag.
-  This will work whether or not you opt for the aynchronous version of the API. However, when inserting js into an
-  ajax response it will have no effect.
+  *Default: false*
 
-* **persist** : true | false
+  By default the scripts are inserted into the head of the HTML response. If you'd prefer the scripts to run after
+  all rendering has completed, set the insert_js_last flag to true and they'll be added at the end of the body tag.
+  This will work whether or not you opt for the aynchronous version of the API. However, this will have no effect
+	when inserting JS into an AJAX response.
 
-  *Default: false*.
+* **persist** : boolean
+
+  *Default: false*
+
   If you would like, the Mixpanel gem may be configured to store its queue in a Rack session. This allows events
-  to be stored through redirects, helpful if you sign in and redirect but want to associate an event with that
-  action. The mixpanel gem will also remove duplicate events from your queue for information that should only be
-  trasmitted to the API once, such as `mixpanel.identify`, `mixpanel.name_tag`, `mixpanel.people.set`, and
+  to be stored through redirects, which can be helpful if you sign in and redirect but want to associate an event with that
+  action. The Mixpanel gem will also remove duplicate events from your queue for information that should only be
+  transmitted to the API once, such as `mixpanel.identify`, `mixpanel.name_tag`, `mixpanel.people.set`, and
   `mixpanel.register`.
-  This allows you to use a before filter to set these variables, redirect, and still have them only transmitted
+
+  This allows you to use a before_filter to set these variables, redirect, and still have them only transmitted
   once.
-  *To enable persistence*, you must set it in both places, Middleware and when you initialize Mixpanel class.
 
-* **config** : a Hash
+  *To enable persistence*, you must set the flag twice: here when instantiating Middleware and again when you initialize
+	the Mixpanel class.
 
-  *Default: {}*.
+* **config** : hash
 
-  You can also pass Mixpanel configuration details as seen here
-  (https://mixpanel.com/docs/integration-libraries/javascript-full-api#set_config)
+  *Default: {}*
+
+  You can also pass additional [Mixpanel configuration details](https://mixpanel.com/docs/integration-libraries/javascript-full-api#set_config).
 
 ## Usage
 
-### Initialize Mixpanel class
+### Initialize Mixpanel
 
 ```ruby
-  @mixpanel = Mixpanel::Tracker.new("YOUR_MIXPANEL_API_TOKEN", request.env, options)
+  @mixpanel = Mixpanel::Tracker.new YOUR_MIXPANEL_API_TOKEN, options
 ```
-Where **options** is a Hash that accepts the following keys:
+Where **options** is a hash that accepts the following keys:
 
-* **async** : true | false
+* **async** : boolean
   
-  *Default: false*.
-  Built in async feature. Events are sent to a subprocess via a pipe and the sub process which asynchronously send events to Mixpanel.
-  This process uses a single thread to upload events, and may start dropping events if your application generates
-  them at a very high rate.
-  If you like for a more robust async behavior take a look at Resque example.
+  *Default: false*
 
-* **url** : String
- 
-  *Default: http://api.mixpanel.com*.
-  If you are proxying Mixpanel API requests then you can set a custom url and additionally stop the token from
-  being sent by marking it as false if you're going to let the proxy add it.
-  Example: { url: "http://localhost:8000/mixpanelproxy" }.
+  Built in async feature. Events are sent to a subprocess via a pipe and the sub process asynchronously send events to Mixpanel.
+  This value can be overwritten on subsequent method calls.  I.e., this setting represents the default for your Mixpanel object,
+	but each call can overwrite this default setting.
+	
+	This process uses a single thread to upload events, and may start dropping events if your application generates
+  them at a very high rate.  While this is a simple way to have asynchronous interaction with Mixpanel, more robust solutions are
+	available.  Specifically, see the [Resque example](#how-to-track-events-using-resque-and-rails) below.
 
-* **persist** : true | false
+* **persist** : boolean
 
-  *Default: false*.
+  *Default: false*
+
+	This is used in connection with the [Rack Middleware section](#rack-middleware) above.  If you are not going to use Middleware
+	to send requests to Mixpanel through JavaScript, you don't need to worry about this option.
+	
   If you would like, the Mixpanel gem may be configured to store its queue in a Rack session. This allows events
-  to be stored through redirects, helpful if you sign in and redirect but want to associate an event with that
-  action. The mixpanel gem will also remove duplicate events from your queue for information that should only be
-  trasmitted to the API once, such as `mixpanel.identify`, `mixpanel.name_tag`, `mixpanel.people.set`, and
+  to be stored through redirects, which can be helpful if you sign in and redirect but want to associate an event with that
+  action. The Mixpanel gem will also remove duplicate events from your queue for information that should only be
+  transmitted to the API once, such as `mixpanel.identify`, `mixpanel.name_tag`, `mixpanel.people.set`, and
   `mixpanel.register`.
-  This allows you to use a before filter to set these variables, redirect, and still have them only transmitted
+
+  This allows you to use a before_filter to set these variables, redirect, and still have them only transmitted
   once.
-  *To enable persistence*, you must set it in both places, Middleware and when you initialize Mixpanel class.
 
-  *To enable import mode* you must set both :import => true and :api_key => YOUR_KEY (not to be confused with the project token.)
-  You can get more information about import mode here
-  (https://mixpanel.com/docs/api-documentation/importing-events-older-than-31-days)
+  *To enable persistence*, you must set the flag twice: here when instantiating Middleware and again when you initialize
+	the Mixpanel class.
 
-### Track events directly.
+* **api_key** : string
+	
+	*Default: nil*
+	
+	When using the [import functionality](#import-events), you must set an API key to go along with your token.  If not set when the
+	class is instantiated, you will be required to send the api key in the options hash of the import method.
+	
+* **env** : hash
+
+	*Default: {}*
+	
+	This is used by the gem to append information from your request environment to your Mixpanel request.  If you are calling this
+	directly from a controller, simply passing in `request.env` will be sufficient.  However, as explained in the Resque example,
+	your environment might choke if it tries to convert that hash to JSON (not to mention how large that hash can be).  You can just pass
+	in a subset of the full environment:
+	
+	```ruby
+	env = {
+    'REMOTE_ADDR' => request.env['REMOTE_ADDR'],
+    'HTTP_X_FORWARDED_FOR' => request.env['HTTP_X_FORWARDED_FOR'],
+    'rack.session' => request.env['rack.session'],
+    'mixpanel_events' => request.env['mixpanel_events']
+  }
+	@mixpanel = Mixpanel::Tracker.new MIXPANEL_TOKEN, { :env => env }
+	```
+	
+	Basically, this information is being used to: set the default IP address associated with the request, and grab any session variables
+	needed to run the Middleware stuff.
+	
+	Additional information contained in your environment (e.g., http_referer) can simply be sent in as attributes where appropriate
+	for your use case.
+
+### Track Events Directly
 
 ```ruby
-  @mixpanel.track_event("Sign in", {:some => "property"})
+  @mixpanel.track event_name, properties, options
 ```
 
-### Interface with People management directly
+**event_name** is a string denoting how you want this event to appear in your Mixpanel dashboard.
+
+**properties** is a hash of properties to be associated with the event.  The keys in the properties can either be strings
+or symbols.  If you send in a key that matches a [special property](https://mixpanel.com/docs/properties-or-segments/special-or-reserved-properties),
+it will automatically be converted to the correct form (e.g., `{ :os => 'Mac' }` will be converted to `{ :$os => 'Mac' }`).
+
+**options** is a hash that accepts the following keys:
+
+* **async** : boolean
+
+	*Default: the async value from when the class was instantiated*
+	
+* **api_key**: string
+
+	*Default: the api_key value from when the class was instantiated*
+
+* **url**: string
+
+	*Default: `http://api.mixpanel.com/track/`*
+	
+	This can be used to proxy Mixpanel API requests.
+	
+Example:
 
 ```ruby
-  @mixpanel.engage_set(@user.id, {:username => @user.username, :email => @user.email})
-  @mixpanel.engage_add(@user.id, {:monkeys_punched => 12})
+@mixpanel.track 'Purchased credits', { :number => 5, 'First Time Buyer' => true }
 ```
 
-### Append events to be tracked with Javascript.
+### Import Events
+
+```ruby
+  @mixpanel.import event_name, properties, options
+```
+
+All of these options have the same meaning and same defaults as the [track method](#track-events-directly), except that the
+default url is `http://api.mixpanel.com/import/`
+
+Example:
+
+```ruby
+@mixpanel.import 'Purchased credits', { :number => 4, :time => 5.weeks.ago }, { :api_key => MY_API_KEY}
+```
+
+### Set Person Attributes Directly
+
+```ruby
+@mixpanel.set distinct_id, properties, options
+```
+
+**distinct_id** is whatever is used to identify the user to Mixpanel.
+
+**properties** is a hash of properties to be set. The keys in the properties can either be strings
+or symbols.  If you send in a key that matches a [special property](https://mixpanel.com/docs/people-analytics/special-properties),
+it will automatically be converted to the correct form (e.g., `{ :first_name => 'Chris' }` will be converted to `{ :$first_name => 'Chris' }`).
+
+**options** is a hash that accepts the following keys:
+
+* **async**: boolean
+
+	*Default: the async value from when the class was instantiated*
+
+* **url**: string
+
+	*Default: `http://api.mixpanel.com/engage/`*
+	
+	This can be used to proxy Mixpanel API requests
+
+Example:
+
+```ruby
+@mixpanel.set 'john-doe', { :age => 31, :email => 'john@doe.com' }
+```
+
+### Increment Person Attributes Directly
+
+```ruby
+@mixpanel.increment distinct_id, properties, options
+```
+
+All of these options have the same meaning and same defaults as the [set method](#set-person-attributes-directly).  Note that according to Mixpanel's
+docs, you cannot combine set and increment requests, and that is why they are split here.
+
+Example:
+
+```ruby
+@mixpanel.increment 'john-doe', { :tokens => 5, :coins => -4 }
+```
+
+### Append Events To Be Tracked With Javascript
 
 *Note*: You should setup the [Rack Middleware](#rack-middleware).
 
 ```ruby
-  @mixpanel.append_event("Sign in", {:some => "property"})
+  @mixpanel.append_track event_name, properties
 ```
+
+**event_name** and **properties** take the same form as [tracking the event directly](#track-events-directly).
 
 ### Execute Javascript API call
 
 *Note*: You should setup the [Rack Middleware](#rack-middleware).
 
 ```ruby
-  @mixpanel.append_api("register", {:some => "property"})
-  @mixpanel.append_api("identify", "Unique Identifier")
+  @mixpanel.append("register", {:some => "property"})
+  @mixpanel.append("identify", "Unique Identifier")
 ```
 
 ### Prevent middleware from inserting code
@@ -159,49 +285,64 @@ $.ajax("/path/to/api/endpoint", {
 
 ### How to use it from Rails controllers?
   
-In your ApplicationController class add a method to instantiate mixpanel.
+In your ApplicationController class add a method to keep track of a Mixpanel instance.
 
 ```ruby
-  before_filter :initialize_mixpanel
-
-  def initialize_mixpanel
-    @mixpanel = Mixpanel::Tracker.new("YOUR_MIXPANEL_API_TOKEN", request.env, options)
-  end
+protected
+def mixpanel
+	@mixpanel ||= Mixpanel::Tracker.new YOUR_MIXPANEL_API_TOKEN, { :env => request.env }
+end
 ```
+
+Then you can call against this method where it makes sense in your controller.  For example, in the users#create method:
+
+```ruby
+def create
+	@user = User.create( :name => 'Jane Doe', :gender => 'female', :mixpanel_identifer => 'asdf' )
+	mixpanel.track 'User Created', { :gender => @user.gender, :distinct_id => @user.mixpanel_identifier, :time => @user.created_at } # Note that passing the time key overwrites the default value of Time.now
+	mixpanel.set @user.mixpanel_identifer, { :gender => @user.gender, :created => @user.created_at, :name => @user.name }
+end
+```
+
 ## How to track events using Resque and Rails
 
-If you don't want to use the built in Mixpanel Gem async feature bellow there is an example about how to make
-async calls using Resque.
-
-[Resque is a Redis-backed Ruby library for creating background jobs](https://github.com/defunkt/resque)
+While there is built-in async functionality, other options are more robust (e.g., using a dedicated queue manager).  Below is an example of how this
+might be done with [Resque](https://github.com/defunkt/resque), but the same concepts would apply no matter what queue manager you use.
 
 ```ruby
-    class MixpanelTrackEventJob
-      @queue = :slow
+class MixpanelTrackEventJob
+	@queue = :slow
 
-      def mixpanel(request_env)
-        Mixpanel::Tracker.new(MIXPANEL_TOKEN, request_env)
-      end
+	def self.mixpanel env
+		Mixpanel::Tracker.new MIXPANEL_TOKEN, { :env => env }
+	end
 
-      def perform(name, params, request_env)
-        mixpanel(request_env).track_event(name, params)
-      end
-    end
+	def self.perform name, properties, env
+		mixpanel(env).track name, params
+	end
+end
 ```
 
 ```ruby
-    class UsersController < ApplicationController
-      def create
-        @user = User.new(params[:user])
+class UsersController < ApplicationController
+	def create
+		@user = User.new(params[:user])
 
-        if @user.save
-          MixpanelTrackEventJob.enqueue("Sign up", {:invited => params[:invited]}, request.env)
-          redirect_to user_root_path
-        else
-          render :new
-        end
-     end
-   end
+		if @user.save
+			env = {
+	      'REMOTE_ADDR' => request.env['REMOTE_ADDR'],
+	      'HTTP_X_FORWARDED_FOR' => request.env['HTTP_X_FORWARDED_FOR'],
+	      'rack.session' => request.env['rack.session'],
+	      'mixpanel_events' => request.env['mixpanel_events']
+	    } # Trying to pass request.env to Resque is going to fail (it chokes when trying to conver it to JSON, but no worries...)
+			
+			Resque.enqueue MixpanelTrackEventJob, 'Sign up', { :invited => params[:invited] }, env
+			redirect_to user_root_path
+		else
+			render :new
+		end
+	end
+end
 ```
 
 ## Supported Ruby Platforms
@@ -210,20 +351,6 @@ async calls using Resque.
 - 1.9.2
 - 1.9.3
 - JRuby 1.8 Mode
-
-## Deprecation Notes
-
-This way to initialize Mixpanel gem is not longer allowed. 
-
-```ruby
-  Mixpanel.new
-```
-
-Use this instead:
-
-```ruby
-  Mixpanel::Tracker.new
-```
 
 ## Collaborators and Maintainers
 
@@ -240,3 +367,4 @@ Use this instead:
 * [Travis Pew](https://github.com/travisp)
 * [Sylvain Niles](https://github.com/sylvainsf)
 * [GBH](https://github.com/GBH)
+* [Goalee](https://github.com/Goalee)
