@@ -1,5 +1,4 @@
 require 'spec_helper'
-require 'mixpanel/middleware'
 
 def exec_default_appends_on(mixpanel)
   mixpanel.append_track("Visit", {:article => 1})
