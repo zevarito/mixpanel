@@ -1,5 +1,5 @@
 module Mixpanel::Person
-  PERSON_PROPERTIES = %w{email created first_name last_name last_login username country_code}
+  PERSON_PROPERTIES = %w{email created first_name last_name name last_login username country_code}
   PERSON_URL = 'http://api.mixpanel.com/engage/'
   
   def set(distinct_id, properties={}, options={})
