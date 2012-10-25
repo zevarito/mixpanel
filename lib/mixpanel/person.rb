@@ -25,6 +25,10 @@ module Mixpanel::Person
   def append_identify(distinct_id)
     append 'identify', distinct_id
   end
+
+  def append_people_identify(distinct_id)
+    append 'people.identify', distinct_id
+  end
   
   protected
   

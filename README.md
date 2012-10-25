@@ -258,6 +258,14 @@ Example:
 
 **event_name** and **properties** take the same form as [tracking the event directly](#track-events-directly).
 
+Note that you must call mixpanel.people.identify() in conjunction with People requests like set(). If you make set() requests before 
+you identify the user, the change will not be immediately sent to Mixpanel. Mixpanel will wait for you to call identify() and then send the accumulated changes.
+
+```ruby
+  @mixpanel.append_people_identify distinct_id
+  @mixpanel.append_set properties
+```
+
 ### Execute Javascript API call
 
 *Note*: You should setup the [Rack Middleware](#rack-middleware).

@@ -84,6 +84,11 @@ describe Mixpanel::Tracker do
         mixpanel_queue_should_include(@mixpanel, "identify", "some@one.com")
       end
 
+      it "should allow people.identify to be called through the JS api" do
+        @mixpanel.append_people_identify "an_identity"
+        mixpanel_queue_should_include(@mixpanel, "people.identify", "an_identity")
+      end
+
       it "should allow the tracking of super properties in JS" do
         props = {:user_id => 12345, :gender => 'male'}
         @mixpanel.append_register props
