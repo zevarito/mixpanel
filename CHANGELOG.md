@@ -1,6 +1,7 @@
 October 2012
 --------------
 
+* Add support for mixpanel.people.identify (Ahmed Belal)
 * Engage endpoint added. (GBH)
 * Code revision (Chris Sturgill)
 
