@@ -6,6 +6,10 @@ module Mixpanel::Event
   def track(event, properties={}, options={})
     track_event event, properties, options, TRACK_URL
   end
+
+  def tracking_pixel(event, properties={}, options={})
+    build_url event, properties, options.merge(:url => TRACK_URL, :img => true)
+  end
   
   def import(event, properties={}, options={})
     track_event event, properties, options, IMPORT_URL
@@ -19,9 +23,7 @@ module Mixpanel::Event
   
   def track_event(event, properties, options, default_url)
     options.reverse_merge! :url => default_url, :async => @async, :api_key => @api_key
-    data = build_event event, track_properties(properties)
-    url = "#{options[:url]}?data=#{encoded_data(data)}"
-    url += "&api_key=#{options[:api_key]}" if options[:api_key].present?
+    url = build_url event, properties, options
     parse_response request(url, options[:async])
   end
   
@@ -37,5 +39,13 @@ module Mixpanel::Event
   
   def build_event(event, properties)
     { :event => event, :properties => properties_hash(properties, EVENT_PROPERTIES) }
+  end
+
+  def build_url event, properties, options
+    data = build_event event, track_properties(properties)
+    url = "#{options[:url]}?data=#{encoded_data(data)}"
+    url << "&api_key=#{options[:api_key]}" if options[:api_key].present?
+    url << "&img=1" if options[:img]
+    url
   end
 end
