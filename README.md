@@ -192,11 +192,16 @@ Example:
 ### Pixel Based Event Tracking
 
 ```ruby
-  image_tag @mixpanel.tracking_pixel("Opened Email", { :distinct_id => "bob@email.com", :campaign => "Retarget"}), :width => 1, :height => 1
+@mixpanel.tracking_pixel "Opened Email", { :distinct_id => "bob@email.com", :campaign => "Retarget" }
 ```
 
 This allows to track events just by loading a pixel. It's usually useful for tracking opened emails.
 You've got to specify your own `distinct_id` as it won't be able to retrieve it from cookies.
+
+And you can use it in your views with an image_tag helper:
+```ruby
+image_tag @mixpanel.tracking_pixel("Opened Email", { :distinct_id => "bob@email.com", :campaign => "Retarget" }), :width => 1, :height => 1
+```
 
 
 Mixpanel docs: https://mixpanel.com/docs/api-documentation/pixel-based-event-tracking
