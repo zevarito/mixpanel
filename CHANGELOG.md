@@ -1,3 +1,8 @@
+November 2012
+-------------
+
+* Pixel Based Event Tracking (Esteban Pastorino)
+
 October 2012
 --------------
 
