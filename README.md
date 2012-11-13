@@ -9,6 +9,7 @@
 - [Usage] (#usage)
   - [Initialize Mixpanel] (#initialize-mixpanel)
 	- [Track Events Directly](#track-events-directly)
+	- [Pixel Based Event Tracking](#pixel-based-event-tracking)
 	- [Import Events](#import-events)
 	- [Set Person Attributes Directly](#set-person-attributes-directly)
 	- [Increment Person Attributes Directly](#increment-person-attributes-directly)
@@ -187,6 +188,25 @@ Example:
 ```ruby
 @mixpanel.track 'Purchased credits', { :number => 5, 'First Time Buyer' => true }
 ```
+
+### Pixel Based Event Tracking
+
+```ruby
+@mixpanel.tracking_pixel "Opened Email", { :distinct_id => "bob@email.com", :campaign => "Retarget" }
+```
+
+This allows to track events just by loading a pixel. It's usually useful for tracking opened emails.
+You've got to specify your own `distinct_id` as it won't be able to retrieve it from cookies.
+
+And you can use it in your views with an image_tag helper:
+```ruby
+image_tag @mixpanel.tracking_pixel("Opened Email", { :distinct_id => "bob@email.com", :campaign => "Retarget" }), :width => 1, :height => 1
+```
+
+
+Mixpanel docs: https://mixpanel.com/docs/api-documentation/pixel-based-event-tracking
+
+
 
 ### Import Events
 

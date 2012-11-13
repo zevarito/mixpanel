@@ -30,6 +30,16 @@ describe Mixpanel::Tracker do
         @mixpanel.track('Sign up', { :likeable => true }, { :api_key => 'asdf' }).should == true
       end
     end
+
+    context "Tracking pixel" do
+      it "should return a URL" do
+        @mixpanel.tracking_pixel("Sign up").should be_a(String)
+      end
+
+      it "should include img=1" do
+        @mixpanel.tracking_pixel("Sign up").should match(/&img=1/)
+      end
+    end
     
     context "Importing events" do
       it "should import simple events" do
