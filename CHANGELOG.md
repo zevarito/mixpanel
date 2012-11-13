@@ -1,6 +1,7 @@
 October 2012
 --------------
 
+* API Changes, please take a look at README file.
 * Add support for mixpanel.people.identify (Ahmed Belal)
 * Engage endpoint added. (GBH)
 * Code revision (Chris Sturgill)
