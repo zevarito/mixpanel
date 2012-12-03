@@ -1,3 +1,7 @@
+December 2012
+-------------
+* FOPS: Removing Active Support dependency.
+
 November 2012
 -------------
 

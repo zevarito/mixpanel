@@ -2,7 +2,7 @@ files = ['README.md', 'LICENSE', 'Rakefile', 'mixpanel.gemspec', '{spec,lib}/**/
 
 spec = Gem::Specification.new do |s|
   s.name = "mixpanel"
-  s.version = "3.1.0"
+  s.version = "3.2.0"
   s.rubyforge_project = "mixpanel"
   s.description = "Simple lib to track events in Mixpanel service. It can be used in any rack based framework."
   s.author = "Alvaro Gil"
@@ -17,7 +17,6 @@ spec = Gem::Specification.new do |s|
   s.add_dependency 'json'
   s.add_dependency 'rack'
   s.add_dependency 'escape'
-  s.add_development_dependency 'active_support'
   s.add_development_dependency 'rspec'
   s.add_development_dependency 'rack-test'
   s.add_development_dependency 'fakeweb'

@@ -33,7 +33,9 @@ module Mixpanel::Person
   protected
 
   def engage(action, distinct_id, properties, options)
-    options.reverse_merge! :async => @async, :url => PERSON_URL
+    default  =  {:async => @async, :url => PERSON_URL}
+    options = default.merge(options)
+
     data = build_person action, distinct_id, properties
     url = "#{options[:url]}?data=#{encoded_data(data)}"
     parse_response request(url, options[:async])
