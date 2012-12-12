@@ -302,7 +302,7 @@ Occasionally you may need to send a request for HTML that you don't want the mid
 
 ```javascript
 $.ajax("/path/to/api/endpoint", {
-	headers: {"SKIP_MIXPANEL_MIDDLEWARE": true},
+	headers: {"Skip-Mixpanel-Middleware": true}, // valid http headers don't allow underscores and get filtered by some webservers
 	success: function(data) {
 		// Process data here
 	}
