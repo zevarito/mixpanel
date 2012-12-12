@@ -39,7 +39,7 @@ describe Mixpanel::Middleware do
     end
     
     it "should not append mixpanel scripts with skip request" do
-      get "/", {}, {"Skip-Mixpanel-Middleware" => true}
+      get "/", {}, {"HTTP_SKIP_MIXPANEL_MIDDLEWARE" => true}
       Nokogiri::HTML(last_response.body).search('script').should be_empty
     end
     

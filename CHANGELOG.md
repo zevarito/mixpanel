@@ -1,7 +1,5 @@
 December 2012
 -------------
-
-* Change skip middleware header key to "Skip-Mixpanel-Middleware". (Chris Friesen)
 * FOPS: Removing Active Support dependency.
 
 November 2012

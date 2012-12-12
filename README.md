@@ -298,11 +298,11 @@ you identify the user, the change will not be immediately sent to Mixpanel. Mixp
 ### Prevent middleware from inserting code
 *Note*: Only applies when [Rack Middleware](#rack-middleware) is setup.
 
-Occasionally you may need to send a request for HTML that you don't want the middleware to alter. In your AJAX request include the header "Skip-Mixpanel-Middleware" to prevent the mixpanel code from being inserted.
+Occasionally you may need to send a request for HTML that you don't want the middleware to alter. In your AJAX request include the header "SKIP_MIXPANEL_MIDDLEWARE" to prevent the mixpanel code from being inserted.
 
 ```javascript
 $.ajax("/path/to/api/endpoint", {
-	headers: {"Skip-Mixpanel-Middleware": true},
+	headers: {"Skip-Mixpanel-Middleware": true}, // valid http headers don't allow underscores and get filtered by some webservers
 	success: function(data) {
 		// Process data here
 	}
