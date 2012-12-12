@@ -346,7 +346,7 @@ class MixpanelTrackEventJob
 	end
 
 	def self.perform name, properties, env
-		mixpanel(env).track name, params
+		mixpanel(env).track name, properties
 	end
 end
 ```
