@@ -42,7 +42,8 @@ module Mixpanel::Person
   end
 
   def build_person(action, distinct_id, properties, options = {})
-    special_properties = options.select{|x| x.to_s.start_with? "$" }
-    { "$#{action}".to_sym => properties_hash(properties, PERSON_PROPERTIES), {:$token => @token, :$distinct_id => distinct_id}.merge(special_properties) }
+    special_properties = options.select{ |x| x.to_s.start_with? "$" }
+    { "$#{action}".to_sym => properties_hash(properties, PERSON_PROPERTIES), 
+      :$token => @token, :$distinct_id => distinct_id }.merge(special_properties)
   end
 end
