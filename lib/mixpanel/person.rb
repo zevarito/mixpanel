@@ -33,7 +33,7 @@ module Mixpanel::Person
   protected
 
   def engage(action, distinct_id, properties, options)
-    default  =  {:async => @async, :url => PERSON_URL, :ignore_time => false, :ip => 0}
+    default  =  {:async => @async, :url => PERSON_URL, :ignore_time => false, :ip => 1}
     options = default.merge(options)
 
     data = build_person action, distinct_id, properties, options
@@ -42,6 +42,15 @@ module Mixpanel::Person
   end
 
   def build_person(action, distinct_id, properties, options)
-    { "$#{action}".to_sym => properties_hash(properties, PERSON_PROPERTIES), :$token => @token, :$distinct_id => distinct_id, :$ignore_time => options[:ignore_time], :$ip => options[:ip]}
+    data = {
+      "$#{action}".to_sym => properties_hash(properties, PERSON_PROPERTIES),
+      :$token => @token,
+      :$distinct_id => distinct_id
+    }
+    
+    data[:$ignore_time] = options[:ignore_time] if options[:ignore_time]
+    data[:$ip] = options[:ip] if options[:ip] == 0
+    
+    data
   end
 end
