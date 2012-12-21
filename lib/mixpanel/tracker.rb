@@ -39,6 +39,10 @@ module Mixpanel
 
     protected
 
+    def ip
+        (@env['HTTP_X_FORWARDED_FOR'] || @env['REMOTE_ADDR'] || '').split(',').last
+    end
+
     # Walk through each property and see if it is in the special_properties.  If so, change the key to have a $ in front of it.
     def properties_hash(properties, special_properties)
       properties.inject({}) do |props, (key, value)|

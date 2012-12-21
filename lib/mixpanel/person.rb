@@ -1,5 +1,6 @@
 module Mixpanel::Person
   PERSON_PROPERTIES = %w{email created first_name last_name name last_login username country_code}
+  PERSON_REQUEST_PROPERTIES = %w{token distinct_id ip}
   PERSON_URL = 'http://api.mixpanel.com/engage/'
 
   def set(distinct_id, properties={}, options={})
@@ -32,16 +33,27 @@ module Mixpanel::Person
 
   protected
 
-  def engage(action, distinct_id, properties, options)
-    default  =  {:async => @async, :url => PERSON_URL}
+  def engage(action, request_properties_or_distinct_id, properties, options)
+    default = {:async => @async, :url => PERSON_URL}
     options = default.merge(options)
 
-    data = build_person action, distinct_id, properties
+    request_properties = person_request_properties(request_properties_or_distinct_id)
+
+    data = build_person action, request_properties, properties
     url = "#{options[:url]}?data=#{encoded_data(data)}"
     parse_response request(url, options[:async])
   end
 
-  def build_person(action, distinct_id, properties)
-    { "$#{action}".to_sym => properties_hash(properties, PERSON_PROPERTIES), :$token => @token, :$distinct_id => distinct_id }
+  def person_request_properties(request_properties_or_distinct_id)
+    default = {:token => @token, :ip => ip}
+    if request_properties_or_distinct_id.respond_to? :to_hash
+      default.merge(request_properties_or_distinct_id)
+    else
+      default.merge({ :distinct_id => request_properties_or_distinct_id })
+    end
+  end
+
+  def build_person(action, request_properties, person_properties)
+    properties_hash(request_properties, PERSON_REQUEST_PROPERTIES).merge({ "$#{action}".to_sym => properties_hash(person_properties, PERSON_PROPERTIES) })
   end
 end
