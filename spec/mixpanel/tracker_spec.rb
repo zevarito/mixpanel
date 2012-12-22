@@ -25,7 +25,7 @@ describe Mixpanel::Tracker do
       it "should track simple events" do
         @mixpanel.track("Sign up").should == true
       end
-      
+
       it "should track events with properties" do
         @mixpanel.track('Sign up', { :likeable => true }, { :api_key => 'asdf' }).should == true
       end
@@ -40,22 +40,26 @@ describe Mixpanel::Tracker do
         @mixpanel.tracking_pixel("Sign up").should match(/&img=1/)
       end
     end
-    
+
     context "Importing events" do
       it "should import simple events" do
         @mixpanel.import('Sign up').should == true
       end
-      
+
       it "should import events with properties" do
         @mixpanel.import('Sign up', { :likeable => true }, { :api_key => 'asdf' }).should == true
       end
     end
-    
+
     context "Engaging people" do
       it "should set attributes" do
         @mixpanel.set('person-a', { :email => 'me@domain.com', :likeable => false }).should == true
       end
-      
+
+      it "should set attributes with request properties" do
+        @mixpanel.set({ :distinct_id => 'person-a', :ignore_time => true },  { :email => 'me@domain.com', :likeable => false }).should == true
+      end
+
       it "should increment attributes" do
         @mixpanel.increment('person-a', { :tokens => 3, :money => -1 }).should == true
       end
