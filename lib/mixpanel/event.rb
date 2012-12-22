@@ -27,10 +27,6 @@ module Mixpanel::Event
     parse_response request(url, options[:async])
   end
 
-  def ip
-    (@env['HTTP_X_FORWARDED_FOR'] || @env['REMOTE_ADDR'] || '').split(',').last
-  end
-
   def track_properties(properties, include_token=true)
     default = {:time => Time.now, :ip => ip}
     properties = default.merge(properties)

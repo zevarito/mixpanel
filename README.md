@@ -226,10 +226,13 @@ Example:
 ### Set Person Attributes Directly
 
 ```ruby
-@mixpanel.set distinct_id, properties, options
+@mixpanel.set distinct_id_or_request_properties, properties, options
 ```
 
-**distinct_id** is whatever is used to identify the user to Mixpanel.
+**distinct_id_or_request_properties** is whatever is used to identify the user to Mixpanel or a hash of
+properties of the [engage event](https://mixpanel.com/docs/people-analytics/people-http-specification-insert-data) that exist
+outside of the `$set`. Special properties will be automatically converted to the correct form (e.g., `{ :ip => '127.0.0.1' }` will be
+converted to `{ :$ip => '127.0.0.1' }`
 
 **properties** is a hash of properties to be set. The keys in the properties can either be strings
 or symbols.  If you send in a key that matches a [special property](https://mixpanel.com/docs/people-analytics/special-properties),
@@ -247,10 +250,16 @@ it will automatically be converted to the correct form (e.g., `{ :first_name => 
 	
 	This can be used to proxy Mixpanel API requests
 
-Example:
+Example using `distinct_id` to identify the user:
 
 ```ruby
 @mixpanel.set 'john-doe', { :age => 31, :email => 'john@doe.com' }
+```
+
+Example using request properties, telling mixpanel to [ignore the time](https://groups.google.com/forum/#!msg/mp-dev/Ao4f8D0IKms/6MVhQqFDzL8J):
+
+```ruby
+@mixpanel.set { :distinct_id => 'john-doe', :ignore_time => true }, { :age => 31, :email => 'john@doe.com' }
 ```
 
 ### Increment Person Attributes Directly
