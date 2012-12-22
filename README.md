@@ -250,7 +250,7 @@ it will automatically be converted to the correct form (e.g., `{ :first_name => 
 	
 	This can be used to proxy Mixpanel API requests
 
-Example:
+Example using `distinct_id` to identify the user:
 
 ```ruby
 @mixpanel.set 'john-doe', { :age => 31, :email => 'john@doe.com' }
@@ -258,7 +258,7 @@ Example:
 
 Example using request properties, telling mixpanel to [ignore the time](https://groups.google.com/forum/#!msg/mp-dev/Ao4f8D0IKms/6MVhQqFDzL8J):
 
-``ruby
+```ruby
 @mixpanel.set { :distinct_id => 'john-doe', :ignore_time => true }, { :age => 31, :email => 'john@doe.com' }
 ```
 
