@@ -1,6 +1,6 @@
 module Mixpanel::Person
   PERSON_PROPERTIES = %w{email created first_name last_name name last_login username country_code}
-  PERSON_REQUEST_PROPERTIES = %w{token distinct_id ip}
+  PERSON_REQUEST_PROPERTIES = %w{token distinct_id ip ignore_time}
   PERSON_URL = 'http://api.mixpanel.com/engage/'
 
   def set(distinct_id, properties={}, options={})
