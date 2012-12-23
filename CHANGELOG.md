@@ -1,5 +1,7 @@
 December 2012
 -------------
+
+* Fix: Github issue #59, When setting people properties, cannot set $ip for proper geolocation.
 * FOPS: Removing Active Support dependency.
 
 November 2012

@@ -8,11 +8,11 @@
   - [Rack Middleware] (#rack-middleware) 
 - [Usage] (#usage)
   - [Initialize Mixpanel] (#initialize-mixpanel)
-	- [Track Events Directly](#track-events-directly)
-	- [Pixel Based Event Tracking](#pixel-based-event-tracking)
-	- [Import Events](#import-events)
-	- [Set Person Attributes Directly](#set-person-attributes-directly)
-	- [Increment Person Attributes Directly](#increment-person-attributes-directly)
+    - [Track Events Directly](#track-events-directly)
+    - [Pixel Based Event Tracking](#pixel-based-event-tracking)
+    - [Import Events](#import-events)
+    - [Set Person Attributes Directly](#set-person-attributes-directly)
+    - [Increment Person Attributes Directly](#increment-person-attributes-directly)
 - [Examples] (#examples)
  - [How to use it from Rails controllers] (#how-to-use-it-from-rails-controllers)
  - [How to track events using Resque and Rails] (#how-to-track-events-using-resque-and-rails)
@@ -59,7 +59,7 @@ Where **options** is a hash that accepts the following keys:
   By default the scripts are inserted into the head of the HTML response. If you'd prefer the scripts to run after
   all rendering has completed, set the insert_js_last flag to true and they'll be added at the end of the body tag.
   This will work whether or not you opt for the aynchronous version of the API. However, this will have no effect
-	when inserting JS into an AJAX response.
+  when inserting JS into an AJAX response.
 
 * **persist** : boolean
 
@@ -74,8 +74,7 @@ Where **options** is a hash that accepts the following keys:
   This allows you to use a before_filter to set these variables, redirect, and still have them only transmitted
   once.
 
-  *To enable persistence*, you must set the flag twice: here when instantiating Middleware and again when you initialize
-	the Mixpanel class.
+  *To enable persistence*, you must set the flag twice: here when instantiating Middleware and again when you initialize the Mixpanel class.
 
 * **config** : hash
 
@@ -93,24 +92,24 @@ Where **options** is a hash that accepts the following keys:
 Where **options** is a hash that accepts the following keys:
 
 * **async** : boolean
-  
+
   *Default: false*
 
   Built in async feature. Events are sent to a subprocess via a pipe and the sub process asynchronously send events to Mixpanel.
   This value can be overwritten on subsequent method calls.  I.e., this setting represents the default for your Mixpanel object,
-	but each call can overwrite this default setting.
-	
-	This process uses a single thread to upload events, and may start dropping events if your application generates
+  but each call can overwrite this default setting.
+
+  This process uses a single thread to upload events, and may start dropping events if your application generates
   them at a very high rate.  While this is a simple way to have asynchronous interaction with Mixpanel, more robust solutions are
-	available.  Specifically, see the [Resque example](#how-to-track-events-using-resque-and-rails) below.
+  available. Specifically, see the [Resque example](#how-to-track-events-using-resque-and-rails) below.
 
 * **persist** : boolean
 
   *Default: false*
 
-	This is used in connection with the [Rack Middleware section](#rack-middleware) above.  If you are not going to use Middleware
-	to send requests to Mixpanel through JavaScript, you don't need to worry about this option.
-	
+  This is used in connection with the [Rack Middleware section](#rack-middleware) above.  If you are not going to use Middleware
+  to send requests to Mixpanel through JavaScript, you don't need to worry about this option.
+
   If you would like, the Mixpanel gem may be configured to store its queue in a Rack session. This allows events
   to be stored through redirects, which can be helpful if you sign in and redirect but want to associate an event with that
   action. The Mixpanel gem will also remove duplicate events from your queue for information that should only be
@@ -121,39 +120,40 @@ Where **options** is a hash that accepts the following keys:
   once.
 
   *To enable persistence*, you must set the flag twice: here when instantiating Middleware and again when you initialize
-	the Mixpanel class.
+  the Mixpanel class.
 
 * **api_key** : string
-	
-	*Default: nil*
-	
-	When using the [import functionality](#import-events), you must set an API key to go along with your token.  If not set when the
-	class is instantiated, you will be required to send the api key in the options hash of the import method.
-	
+
+  *Default: nil*
+
+  When using the [import functionality](#import-events), you must set an API key to go along with your token.  If not set when the
+  class is instantiated, you will be required to send the api key in the options hash of the import method.
+
 * **env** : hash
 
-	*Default: {}*
-	
-	This is used by the gem to append information from your request environment to your Mixpanel request.  If you are calling this
-	directly from a controller, simply passing in `request.env` will be sufficient.  However, as explained in the Resque example,
-	your environment might choke if it tries to convert that hash to JSON (not to mention how large that hash can be).  You can just pass
-	in a subset of the full environment:
-	
-	```ruby
-	env = {
-    'REMOTE_ADDR' => request.env['REMOTE_ADDR'],
-    'HTTP_X_FORWARDED_FOR' => request.env['HTTP_X_FORWARDED_FOR'],
-    'rack.session' => request.env['rack.session'],
-    'mixpanel_events' => request.env['mixpanel_events']
-  }
-	@mixpanel = Mixpanel::Tracker.new MIXPANEL_TOKEN, { :env => env }
-	```
-	
-	Basically, this information is being used to: set the default IP address associated with the request, and grab any session variables
-	needed to run the Middleware stuff.
-	
-	Additional information contained in your environment (e.g., http_referer) can simply be sent in as attributes where appropriate
-	for your use case.
+  *Default: {}*
+
+  This is used by the gem to append information from your request environment to your Mixpanel request.  If you are calling this
+  directly from a controller, simply passing in `request.env` will be sufficient.  However, as explained in the Resque example,
+  your environment might choke if it tries to convert that hash to JSON (not to mention how large that hash can be).  You can just pass
+  in a subset of the full environment:
+
+  ```ruby
+    env = {
+      'REMOTE_ADDR' => request.env['REMOTE_ADDR'],
+      'HTTP_X_FORWARDED_FOR' => request.env['HTTP_X_FORWARDED_FOR'],
+      'rack.session' => request.env['rack.session'],
+      'mixpanel_events' => request.env['mixpanel_events']
+    }
+
+    @mixpanel = Mixpanel::Tracker.new MIXPANEL_TOKEN, { :env => env }
+  ```
+
+  Basically, this information is being used to: set the default IP address associated with the request, and grab any session variables
+  needed to run the Middleware stuff.
+
+  Additional information contained in your environment (e.g., http_referer) can simply be sent in as attributes where appropriate
+  for your use case.
 
 ### Track Events Directly
 
@@ -171,18 +171,18 @@ it will automatically be converted to the correct form (e.g., `{ :os => 'Mac' }`
 
 * **async** : boolean
 
-	*Default: the async value from when the class was instantiated*
-	
+  *Default: the async value from when the class was instantiated*
+
 * **api_key**: string
 
-	*Default: the api_key value from when the class was instantiated*
+  *Default: the api_key value from when the class was instantiated*
 
 * **url**: string
 
-	*Default: `http://api.mixpanel.com/track/`*
-	
-	This can be used to proxy Mixpanel API requests.
-	
+  *Default: `http://api.mixpanel.com/track/`*
+
+  This can be used to proxy Mixpanel API requests.
+
 Example:
 
 ```ruby
@@ -242,13 +242,13 @@ it will automatically be converted to the correct form (e.g., `{ :first_name => 
 
 * **async**: boolean
 
-	*Default: the async value from when the class was instantiated*
+  *Default: the async value from when the class was instantiated*
 
 * **url**: string
 
-	*Default: `http://api.mixpanel.com/engage/`*
-	
-	This can be used to proxy Mixpanel API requests
+  *Default: `http://api.mixpanel.com/engage/`*
+
+  This can be used to proxy Mixpanel API requests
 
 Example using `distinct_id` to identify the user:
 
@@ -310,35 +310,39 @@ you identify the user, the change will not be immediately sent to Mixpanel. Mixp
 Occasionally you may need to send a request for HTML that you don't want the middleware to alter. In your AJAX request include the header "SKIP_MIXPANEL_MIDDLEWARE" to prevent the mixpanel code from being inserted.
 
 ```javascript
-$.ajax("/path/to/api/endpoint", {
-	headers: {"Skip-Mixpanel-Middleware": true}, // valid http headers don't allow underscores and get filtered by some webservers
-	success: function(data) {
-		// Process data here
-	}
-});
+  $.ajax("/path/to/api/endpoint", {
+    headers: {"Skip-Mixpanel-Middleware": true}, // valid http headers don't allow underscores and get filtered by some webservers
+    success: function(data) {
+      // Process data here
+    }
+  });
 ```
 
 ## Examples
 
 ### How to use it from Rails controllers?
-  
+
 In your ApplicationController class add a method to keep track of a Mixpanel instance.
 
 ```ruby
-protected
-def mixpanel
-	@mixpanel ||= Mixpanel::Tracker.new YOUR_MIXPANEL_API_TOKEN, { :env => request.env }
-end
+  def mixpanel
+    @mixpanel ||= Mixpanel::Tracker.new YOUR_MIXPANEL_API_TOKEN, { :env => request.env }
+  end
 ```
 
 Then you can call against this method where it makes sense in your controller.  For example, in the users#create method:
 
 ```ruby
-def create
-	@user = User.create( :name => 'Jane Doe', :gender => 'female', :mixpanel_identifer => 'asdf' )
-	mixpanel.track 'User Created', { :gender => @user.gender, :distinct_id => @user.mixpanel_identifier, :time => @user.created_at } # Note that passing the time key overwrites the default value of Time.now
-	mixpanel.set @user.mixpanel_identifer, { :gender => @user.gender, :created => @user.created_at, :name => @user.name }
-end
+  def create
+    @user = User.create( :name => 'Jane Doe', :gender => 'female', :mixpanel_identifer => 'asdf' )
+    mixpanel.track 'User Created', {
+      :gender => @user.gender,
+      :distinct_id => @user.mixpanel_identifier,
+      :time => @user.created_at
+    } # Note that passing the time key overwrites the default value of Time.now
+
+    mixpanel.set @user.mixpanel_identifer, { :gender => @user.gender, :created => @user.created_at, :name => @user.name }
+  end
 ```
 
 ## How to track events using Resque and Rails
@@ -348,38 +352,39 @@ might be done with [Resque](https://github.com/defunkt/resque), but the same con
 
 ```ruby
 class MixpanelTrackEventJob
-	@queue = :slow
+  @queue = :slow
 
-	def self.mixpanel env
-		Mixpanel::Tracker.new MIXPANEL_TOKEN, { :env => env }
-	end
+  def self.mixpanel env
+    Mixpanel::Tracker.new MIXPANEL_TOKEN, { :env => env }
+  end
 
-	def self.perform name, properties, env
-		mixpanel(env).track name, properties
-	end
+  def self.perform name, properties, env
+    mixpanel(env).track name, properties
+  end
 end
 ```
 
 ```ruby
-class UsersController < ApplicationController
-	def create
-		@user = User.new(params[:user])
+  class UsersController < ApplicationController
+    def create
+      @user = User.new(params[:user])
 
-		if @user.save
-			env = {
-	      'REMOTE_ADDR' => request.env['REMOTE_ADDR'],
-	      'HTTP_X_FORWARDED_FOR' => request.env['HTTP_X_FORWARDED_FOR'],
-	      'rack.session' => request.env['rack.session'],
-	      'mixpanel_events' => request.env['mixpanel_events']
-	    } # Trying to pass request.env to Resque is going to fail (it chokes when trying to conver it to JSON, but no worries...)
-			
-			Resque.enqueue MixpanelTrackEventJob, 'Sign up', { :invited => params[:invited] }, env
-			redirect_to user_root_path
-		else
-			render :new
-		end
-	end
-end
+      if @user.save
+        env = {
+          'REMOTE_ADDR' => request.env['REMOTE_ADDR'],
+          'HTTP_X_FORWARDED_FOR' => request.env['HTTP_X_FORWARDED_FOR'],
+          'rack.session' => request.env['rack.session'],
+          'mixpanel_events' => request.env['mixpanel_events']
+        } # Trying to pass request.env to Resque is going to fail (it chokes when trying to conver it to JSON, but no worries...)
+
+        Resque.enqueue MixpanelTrackEventJob, 'Sign up', { :invited => params[:invited] }, env
+
+        redirect_to user_root_path
+      else
+        render :new
+      end
+    end
+  end
 ```
 
 ## Supported Ruby Platforms
@@ -407,3 +412,4 @@ end
 * [Goalee](https://github.com/Goalee)
 * [Ahmed Belal](https://github.com/AhmedBelal)
 * [Esteban Pastorino](https://github.com/kitop)
+* [Jeffrey Chu](https://github.com/jochu)
