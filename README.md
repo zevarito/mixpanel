@@ -259,7 +259,7 @@ Example using `distinct_id` to identify the user:
 Example using request properties, telling mixpanel to [ignore the time](https://groups.google.com/forum/#!msg/mp-dev/Ao4f8D0IKms/6MVhQqFDzL8J):
 
 ```ruby
-@mixpanel.set { :distinct_id => 'john-doe', :ignore_time => true }, { :age => 31, :email => 'john@doe.com' }
+@mixpanel.set({ :distinct_id => 'john-doe', :ignore_time => true }, { :age => 31, :email => 'john@doe.com' })
 ```
 
 ### Increment Person Attributes Directly
