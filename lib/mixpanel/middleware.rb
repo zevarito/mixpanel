@@ -38,6 +38,8 @@ module Mixpanel
             part.insert(insert_at, render_event_tracking_scripts) unless queue.empty?
             part.insert(insert_at, render_mixpanel_scripts) #This will insert the mixpanel initialization code before the queue of tracking events.
           end
+        elsif is_turbolink_request? && is_html_response?
+          part.insert(part.index('</body'), render_event_tracking_scripts) unless queue.empty?
         elsif is_ajax_request? && is_html_response?
           part.insert(0, render_event_tracking_scripts) unless queue.empty?
         elsif is_ajax_request? && is_javascript_response?
@@ -53,7 +55,11 @@ module Mixpanel
     end
 
     def is_regular_request?
-      !is_ajax_request?
+      !is_ajax_request? && !is_turbolink_request?
+    end
+
+    def is_turbolink_request?
+      @env.has_key?("HTTP_X_XHR_REFERER")
     end
 
     def is_ajax_request?
@@ -133,7 +139,7 @@ module Mixpanel
       return "" if queue.empty?
 
       output = queue.map {|type, arguments| %(mixpanel.#{type}(#{arguments.join(', ')});) }.join("\n")
-      output = "try {#{output}} catch(err) {}"
+      output = "try {#{output}} catch(err) {};"
 
       include_script_tag ? "<script type='text/javascript'>#{output}</script>" : output
     end
