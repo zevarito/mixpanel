@@ -1,3 +1,8 @@
+Jan 2013
+--------
+
+* Add support for Turbolinks (Jon Pospischil)
+
 December 2012
 -------------
 
