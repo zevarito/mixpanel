@@ -1,3 +1,5 @@
+# This is an updated version of the mixpanel gem with support for turbolinks
+
 [![Build Status](https://secure.travis-ci.org/zevarito/mixpanel.png?branch=master)](http://travis-ci.org/zevarito/mixpanel)
 
 ## Table of Contents
