@@ -11,6 +11,16 @@ module Mixpanel::Person
     engage :add, distinct_id, properties, options
   end
 
+  def track_charge(distinct_id, amount, time=Time.now, options={})
+    charge_properties = {
+      '$transactions' => {
+        '$amount' => amount,
+        '$time' => time,
+        }
+      }
+    engage :append, distinct_id, charge_properties, options
+  end
+
   def append_set(properties={})
     append 'people.set', properties_hash(properties, PERSON_PROPERTIES)
   end
