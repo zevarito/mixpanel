@@ -283,6 +283,8 @@ Example:
 @mixpanel.track_charge distinct_id, amount, time, options
 ```
 
+This allows you to use the Revenue tab in your mixpanel dashboard.
+
 Example:
 
 ```ruby
