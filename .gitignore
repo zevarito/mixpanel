@@ -1,5 +1,5 @@
 .bundle
-vendor
+vendor/bundle
 mixpanel*.gem
 Gemfile.lock
 .rvmrc
