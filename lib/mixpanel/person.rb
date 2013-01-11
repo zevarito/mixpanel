@@ -21,6 +21,10 @@ module Mixpanel::Person
     engage :append, distinct_id, charge_properties, options
   end
 
+  def reset_charges(distinct_id, options={})
+    engage :set, distinct_id, { '$transactions' => [] }, options
+  end
+
   def append_set(properties={})
     append 'people.set', properties_hash(properties, PERSON_PROPERTIES)
   end

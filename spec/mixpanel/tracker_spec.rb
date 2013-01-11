@@ -67,6 +67,10 @@ describe Mixpanel::Tracker do
       it "should track charges" do
         @mixpanel.track_charge('person-a', 20.0).should == true
       end
+
+      it "should reset charges" do
+        @mixpanel.reset_charges('person-a').should == true
+      end
     end
   end
 
