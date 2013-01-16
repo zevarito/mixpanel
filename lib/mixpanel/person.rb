@@ -1,5 +1,6 @@
 module Mixpanel::Person
   PERSON_PROPERTIES = %w{email created first_name last_name name last_login username country_code}
+  TRANSACTION_PROPERTIES = %w{time amount}
   PERSON_REQUEST_PROPERTIES = %w{token distinct_id ip ignore_time}
   PERSON_URL = 'http://api.mixpanel.com/engage/'
 
@@ -9,6 +10,10 @@ module Mixpanel::Person
 
   def increment(distinct_id, properties={}, options={})
     engage :add, distinct_id, properties, options
+  end
+
+  def append_charge(distinct_id, properties={}, options = {})
+    engage :append, distinct_id, properties, options
   end
 
   def append_set(properties={})
@@ -37,9 +42,19 @@ module Mixpanel::Person
     default = {:async => @async, :url => PERSON_URL}
     options = default.merge(options)
 
-    request_properties = person_request_properties(request_properties_or_distinct_id)
+    if action == :append
+      request_properties = person_request_properties(request_properties_or_distinct_id)
 
-    data = build_person action, request_properties, properties
+      transaction_default = { :time => Time.now }
+      properties = transaction_default.merge(properties)
+
+      data = build_transaction action, request_properties, properties
+    else
+      request_properties = person_request_properties(request_properties_or_distinct_id)
+
+      data = build_person action, request_properties, properties
+    end
+
     url = "#{options[:url]}?data=#{encoded_data(data)}"
     parse_response request(url, options[:async])
   end
@@ -51,6 +66,10 @@ module Mixpanel::Person
     else
       default.merge({ :distinct_id => request_properties_or_distinct_id })
     end
+  end
+
+  def build_transaction(action, request_properties, transaction_properties)
+    properties_hash(request_properties, PERSON_REQUEST_PROPERTIES).merge({ "$#{action}".to_sym => {"$transactions".to_sym => properties_hash(transaction_properties, TRANSACTION_PROPERTIES) } })
   end
 
   def build_person(action, request_properties, person_properties)
