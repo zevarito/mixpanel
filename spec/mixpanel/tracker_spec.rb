@@ -63,6 +63,10 @@ describe Mixpanel::Tracker do
       it "should increment attributes" do
         @mixpanel.increment('person-a', { :tokens => 3, :money => -1 }).should == true
       end
+
+      it "should append charge attributes" do
+        @mixpanel.append_charge('person-a', { :time => Time.now, :amount => 30.00}).should == true
+      end
     end
   end
 
