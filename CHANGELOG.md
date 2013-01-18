@@ -2,6 +2,7 @@ Jan 2013
 --------
 
 * Add support for Turbolinks (Jon Pospischil)
+* Add track_charge and reset_charges to Mixpanel::Person (Tom Brown)
 
 December 2012
 -------------
