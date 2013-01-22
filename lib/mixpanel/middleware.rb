@@ -7,6 +7,7 @@ module Mixpanel
       @app = app
       @token = mixpanel_token
       @options = {
+        :insert_mixpanel_scripts=> true,
         :insert_js_last => false,
         :persist => false,
         :config => {}
@@ -36,7 +37,9 @@ module Mixpanel
           insert_at = part.index(@options[:insert_js_last] ? '</body' : '</head')
           unless insert_at.nil?
             part.insert(insert_at, render_event_tracking_scripts) unless queue.empty?
-            part.insert(insert_at, render_mixpanel_scripts) #This will insert the mixpanel initialization code before the queue of tracking events.
+            if @options[:insert_mixpanel_scripts]
+              part.insert(insert_at, render_mixpanel_scripts) #This will insert the mixpanel initialization code before the queue of tracking events.
+            end
           end
         elsif is_turbolink_request? && is_html_response?
           part.insert(part.index('</body'), render_event_tracking_scripts) unless queue.empty?
