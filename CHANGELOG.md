@@ -1,6 +1,7 @@
 Jan 2013
 --------
 
+* Add option to not render mixpanel scripts (Murilo Pereira)
 * Add support for Turbolinks (Jon Pospischil)
 * Add track_charge and reset_charges to Mixpanel::Person (Tom Brown)
 

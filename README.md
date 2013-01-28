@@ -443,3 +443,4 @@ end
 * [Jeffrey Chu](https://github.com/jochu)
 * [Jon Pospischil] (https://github.com/pospischil)
 * [Tom Brown] (https://github.com/nottombrown)
+* [Murilo Pereira] (https://github.com/mpereira)
