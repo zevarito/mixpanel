@@ -52,6 +52,14 @@ initializer for it:
 
 Where **options** is a hash that accepts the following keys:
 
+* **insert_mixpanel_scripts** : boolean
+
+  *Default: true*
+
+  By default the Mixpanel JavaScript API library scripts are inserted into the
+  HTML. If you'd prefer to insert them yourself, set the
+  insert_mixpanel_scripts flag to false.
+
 * **insert_js_last** : boolean
 
   *Default: false*
