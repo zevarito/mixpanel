@@ -71,6 +71,10 @@ describe Mixpanel::Tracker do
       it "should reset charges" do
         @mixpanel.reset_charges('person-a').should == true
       end
+
+      it "should unset property" do
+        @mixpanel.unset('person-a', 'property').should == true
+      end
     end
   end
 
