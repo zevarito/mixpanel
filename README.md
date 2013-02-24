@@ -346,6 +346,12 @@ Occasionally you may need to send a request for HTML that you don't want the mid
   });
 ```
 
+Alternatively, you can add this line of code to your controller to temporarily disable the middleware:
+
+ ```ruby
+   Mixpanel::Middleware.skip_this_request
+ ```
+
 ## Examples
 
 ### How to use it from Rails controllers?

@@ -3,6 +3,15 @@ require 'json'
 
 module Mixpanel
   class Middleware
+    class << self
+      attr_accessor :skip_request
+      def skip_this_request
+        @skip_request = true
+      end
+    end
+
+    @skip_request = false
+
     def initialize(app, mixpanel_token, options={})
       @app = app
       @token = mixpanel_token
@@ -18,13 +27,15 @@ module Mixpanel
       @env = env
 
       @status, @headers, @response = @app.call(env)
-      
-      if is_trackable_response?
+
+      if is_trackable_response? && !Mixpanel::Middleware.skip_request
         merge_queue! if @options[:persist]
         update_response!
         update_content_length!
         delete_event_queue!
       end
+
+      Mixpanel::Middleware.skip_request = false
 
       [@status, @headers, @response]
     end
