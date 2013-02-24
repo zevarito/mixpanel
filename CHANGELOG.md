@@ -1,6 +1,12 @@
+Version Bump
+------------
+
+3.5.2 Feb 24, 2013
+
 Feb 2013
 --------
 
+* Ability to skip middleware js snippet injection. (adimichele)
 * Ability to unset a person property (Marko Vasiljevic)
 * Update DelayedJob documentation (Joel)
 
