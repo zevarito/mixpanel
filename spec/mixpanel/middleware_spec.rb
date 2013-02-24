@@ -47,6 +47,18 @@ describe Mixpanel::Middleware do
       get "/"
       Nokogiri::HTML(last_response.body).search('script').size.should == 1
     end
+
+    context "when disabling with #skip_this_request" do
+      before{ Mixpanel::Middleware.skip_this_request }
+
+      it "should skip this request but not the next request" do
+        get "/"
+        Nokogiri::HTML(last_response.body).search('script').should be_empty
+        get "/"
+        Nokogiri::HTML(last_response.body).search('script').size.should == 1
+      end
+
+    end
   end
     
   describe "Appending async mixpanel scripts" do
