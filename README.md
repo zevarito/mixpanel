@@ -415,6 +415,61 @@ end
   end
 ```
 
+## How to track events using Delayed Job and Rails
+Below is an example of implementing async even tracking with Delayed Job
+
+**Create a new worker**
+```ruby
+class MixpanelWorker < Struct.new(:name, :properties, :request_env)
+  def perform
+      if defined?(MIXPANEL_TOKEN)
+        @mixpanel = Mixpanel::Tracker.new(MIXPANEL_TOKEN, { :env => request_env })
+      else
+        @mixpanel = DummyMixpanel.new
+      end
+
+      @mixpanel.track(name, properties)
+  end
+end
+```
+
+**Add the following to your Application controller**
+```ruby
+class ApplicationController < ActionController::Base
+  before_filter :initialize_env
+  
+  private
+  ##
+  # Initialize env for mixpanel
+  def initialize_env
+    # Similar to the Resque problem above, we need to help DJ serialize the 
+    # request object. 
+    @request_env = {
+      'REMOTE_ADDR' => request.env['REMOTE_ADDR'],
+      'HTTP_X_FORWARDED_FOR' => request.env['HTTP_X_FORWARDED_FOR'],
+      'rack.session' => request.env['rack.session'].to_hash,
+      'mixpanel_events' => request.env['mixpanel_events']
+    }
+  end
+```
+**You can optionally create a nice model wrapper to tidy things up**
+```ruby
+#app/models/mix_panel.rb
+class MixPanel
+  def self.track(name, properties, env)
+    # Notice we are using the 'mixpanel' queue
+		Delayed::Job.enqueue MixpanelWorker.new(name, properties, env), queue: 'mixpanel'
+	end
+end
+```
+**Sample Usage**
+```ruby
+MixPanel.track("Front Page Load", { 
+                url_type: short_url.uid_type, 
+                page_name: short_url.page.name, 
+                distinct_id: @client_uid }, @request_env)
+```
+
 ## Supported Ruby Platforms
 
 - 1.8.7
