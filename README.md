@@ -499,3 +499,5 @@ MixPanel.track("Front Page Load", {
 * [Jon Pospischil] (https://github.com/pospischil)
 * [Tom Brown] (https://github.com/nottombrown)
 * [Murilo Pereira] (https://github.com/mpereira)
+* [Marko Vasiljevic] (https://github.com/marmarko)
+* [Joel] (https://github.com/jclay)

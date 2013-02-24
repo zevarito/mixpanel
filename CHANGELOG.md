@@ -1,10 +1,18 @@
+Feb 2013
+--------
+
+* Ability to unset a person property (Marko Vasiljevic)
+* Update DelayedJob documentation (Joel)
+
+Version Bump
+------------
+
+3.5.1 Jan 28, 2013
 
 Jan 2013
 --------
 
-* 3.5.1
-** Add option to not render mixpanel scripts (Murilo Pereira)
-
+* Add option to not render mixpanel scripts (Murilo Pereira)
 * Add support for Turbolinks (Jon Pospischil)
 * Add track_charge and reset_charges to Mixpanel::Person (Tom Brown)
 
