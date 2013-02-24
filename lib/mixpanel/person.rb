@@ -7,6 +7,10 @@ module Mixpanel::Person
     engage :set, distinct_id, properties, options
   end
 
+  def unset(distinct_id, property, options={})
+    engage :unset, distinct_id, property, options
+  end
+
   def increment(distinct_id, properties={}, options={})
     engage :add, distinct_id, properties, options
   end
@@ -53,7 +57,12 @@ module Mixpanel::Person
 
     request_properties = person_request_properties(request_properties_or_distinct_id)
 
-    data = build_person action, request_properties, properties
+    if action == :unset
+      data = build_person_unset request_properties, properties
+    else
+      data = build_person action, request_properties, properties
+    end
+
     url = "#{options[:url]}?data=#{encoded_data(data)}"
     parse_response request(url, options[:async])
   end
@@ -69,5 +78,9 @@ module Mixpanel::Person
 
   def build_person(action, request_properties, person_properties)
     properties_hash(request_properties, PERSON_REQUEST_PROPERTIES).merge({ "$#{action}".to_sym => properties_hash(person_properties, PERSON_PROPERTIES) })
+  end
+
+  def build_person_unset(request_properties, property)
+    properties_hash(request_properties, PERSON_REQUEST_PROPERTIES).merge({ "$unset".to_sym => [property] })
   end
 end
