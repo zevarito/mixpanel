@@ -120,6 +120,12 @@ describe Mixpanel::Tracker do
         @mixpanel.append_register props
         mixpanel_queue_should_include(@mixpanel, 'register', props)
       end
+
+      it "should allow the one-time tracking of super properties in JS" do
+        props = {:user_id => 12345, :gender => 'male'}
+        @mixpanel.append_register_once props
+        mixpanel_queue_should_include(@mixpanel, 'register_once', props)
+      end
     end
   end
 
