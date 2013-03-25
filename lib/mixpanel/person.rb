@@ -41,6 +41,10 @@ module Mixpanel::Person
     append 'register', properties_hash(properties, PERSON_PROPERTIES)
   end
 
+  def append_register_once(properties={})
+    append 'register_once', properties_hash(properties, PERSON_PROPERTIES)
+  end
+
   def append_identify(distinct_id)
     append 'identify', distinct_id
   end
