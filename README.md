@@ -47,7 +47,7 @@ If you are using Rails you can add this to your specific environment configurati
 initializer for it:
 
 ```ruby
-  config.middleware.use "Mixpanel::Middleware", "YOUR_MIXPANEL_API_TOKEN", options
+  config.middleware.use "Mixpanel::Middleware", "YOUR_MIXPANEL_API_TOKEN", config: options
 ```
 
 Where **options** is a hash that accepts the following keys:
@@ -95,7 +95,7 @@ Where **options** is a hash that accepts the following keys:
 ### Initialize Mixpanel
 
 ```ruby
-  @mixpanel = Mixpanel::Tracker.new YOUR_MIXPANEL_API_TOKEN, options
+  @mixpanel = Mixpanel::Tracker.new YOUR_MIXPANEL_API_TOKEN, config: options
 ```
 Where **options** is a hash that accepts the following keys:
 
