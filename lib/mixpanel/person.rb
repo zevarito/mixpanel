@@ -53,6 +53,10 @@ module Mixpanel::Person
     append 'people.identify', distinct_id
   end
 
+  def delete(distinct_id)
+    engage 'delete', distinct_id, {}, {}
+  end
+
   protected
 
   def engage(action, request_properties_or_distinct_id, properties, options)

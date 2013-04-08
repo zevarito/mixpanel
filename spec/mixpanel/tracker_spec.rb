@@ -75,6 +75,10 @@ describe Mixpanel::Tracker do
       it "should unset property" do
         @mixpanel.unset('person-a', 'property').should == true
       end
+
+      it "should delete a user from mixpanel" do
+        @mixpanel.delete('person-a').should == true
+      end
     end
   end
 
