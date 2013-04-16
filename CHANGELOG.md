@@ -1,7 +1,9 @@
-Version Bump
-------------
+April 2013
+----------
 
-3.5.2 Feb 24, 2013
+* Delete a user from mixpanel (dennisvdvliet)
+
+Bump: 3.5.2 Feb 24, 2013
 
 Feb 2013
 --------
@@ -10,10 +12,7 @@ Feb 2013
 * Ability to unset a person property (Marko Vasiljevic)
 * Update DelayedJob documentation (Joel)
 
-Version Bump
-------------
-
-3.5.1 Jan 28, 2013
+Bump: 3.5.1 Jan 28, 2013
 
 Jan 2013
 --------
