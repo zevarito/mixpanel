@@ -56,6 +56,10 @@ describe Mixpanel::Tracker do
         @mixpanel.set('person-a', { :email => 'me@domain.com', :likeable => false }).should == true
       end
 
+      it "should set an attribute once" do
+        @mixpanel.set_once('person-a', { :email => 'me@domain.com', :likeable => false }).should == true
+      end
+
       it "should set attributes with request properties" do
         @mixpanel.set({ :distinct_id => 'person-a', :ignore_time => true },  { :email => 'me@domain.com', :likeable => false }).should == true
       end
