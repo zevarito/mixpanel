@@ -84,7 +84,7 @@ describe Mixpanel::Middleware do
       end
 
       it "should not append mixpanel scripts to head element" do
-        last_response.body.index('var mp_protocol').should be_nil
+        last_response.body.index('window.mixpanel').should be_nil
       end
 
       it "should pass through if the document is not text/html content type" do
@@ -158,7 +158,7 @@ describe Mixpanel::Middleware do
       end
 
       it "should not append mixpanel scripts to head element" do
-        last_response.body.index('var mp_protocol').should be_nil
+        last_response.body.index('window.mixpanel').should be_nil
       end
 
       it "should pass through if the document is not text/html content type" do
