@@ -483,6 +483,11 @@ MixPanel.track("Front Page Load", {
 - 1.9.3
 - JRuby 1.8 Mode
 
+## Deprecation Notes
+
+  * 4.0.0
+    People API #append_people_identify => #append_identify
+
 ## Collaborators and Maintainers
 
 * [Alvaro Gil](https://github.com/zevarito) (Author)
