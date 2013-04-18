@@ -1,14 +1,16 @@
 April 2013
 ----------
 
+Bump: 4.0.0 Apr 18, 2013
+
 * Delete a user from mixpanel (dennisvdvliet)
 * Ability to set_once properties (Michael Glass)
 * Use mixpanel script version 2.2. Replaced person.identify with unified identify. Added person.alias. (Milo Winningham)
 
-Bump: 3.5.2 Feb 24, 2013
-
 Feb 2013
 --------
+
+Bump: 3.5.2 Feb 24, 2013
 
 * Ability to skip middleware js snippet injection. (adimichele)
 * Ability to unset a person property (Marko Vasiljevic)
