@@ -1,5 +1,7 @@
 module Mixpanel::Person
-  PERSON_PROPERTIES = %w{email created first_name last_name name last_login username country_code}
+  #from https://mixpanel.com/docs/people-analytics/special-properties
+  PERSON_PROPERTIES = %w{email created first_name last_name name last_login username country_code region city}
+  #from https://mixpanel.com/docs/people-analytics/people-http-specification-insert-data
   PERSON_REQUEST_PROPERTIES = %w{token distinct_id ip ignore_time}
   PERSON_URL = 'http://api.mixpanel.com/engage/'
 
@@ -9,6 +11,10 @@ module Mixpanel::Person
 
   def unset(distinct_id, property, options={})
     engage :unset, distinct_id, property, options
+  end
+
+  def set_once(distinct_id, properties={}, options={})
+    engage :set_once, distinct_id, properties, options
   end
 
   def increment(distinct_id, properties={}, options={})
@@ -25,12 +31,20 @@ module Mixpanel::Person
     engage :append, distinct_id, charge_properties, options
   end
 
+  def delete(distinct_id)
+    engage 'delete', distinct_id, {}, {}
+  end
+
   def reset_charges(distinct_id, options={})
     engage :set, distinct_id, { '$transactions' => [] }, options
   end
 
   def append_set(properties={})
     append 'people.set', properties_hash(properties, PERSON_PROPERTIES)
+  end
+
+  def append_set_once(properties = {})
+    append 'people.set_once', properties_hash(properties, PERSON_PROPERTIES)
   end
 
   def append_increment(property, increment=1)
@@ -49,12 +63,8 @@ module Mixpanel::Person
     append 'identify', distinct_id
   end
 
-  def append_people_identify(distinct_id)
-    append 'people.identify', distinct_id
-  end
-
-  def delete(distinct_id)
-    engage 'delete', distinct_id, {}, {}
+  def append_alias(aliased_id)
+    append 'alias', aliased_id
   end
 
   protected

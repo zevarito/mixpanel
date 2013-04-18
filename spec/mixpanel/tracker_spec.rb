@@ -56,6 +56,10 @@ describe Mixpanel::Tracker do
         @mixpanel.set('person-a', { :email => 'me@domain.com', :likeable => false }).should == true
       end
 
+      it "should set an attribute once" do
+        @mixpanel.set_once('person-a', { :email => 'me@domain.com', :likeable => false }).should == true
+      end
+
       it "should set attributes with request properties" do
         @mixpanel.set({ :distinct_id => 'person-a', :ignore_time => true },  { :email => 'me@domain.com', :likeable => false }).should == true
       end
@@ -114,15 +118,15 @@ describe Mixpanel::Tracker do
         mixpanel_queue_should_include(@mixpanel, "identify", "some@one.com")
       end
 
-      it "should allow people.identify to be called through the JS api" do
-        @mixpanel.append_people_identify "an_identity"
-        mixpanel_queue_should_include(@mixpanel, "people.identify", "an_identity")
-      end
-
       it "should allow the tracking of super properties in JS" do
         props = {:user_id => 12345, :gender => 'male'}
         @mixpanel.append_register props
         mixpanel_queue_should_include(@mixpanel, 'register', props)
+      end
+
+      it "should allow alias to be called through the JS api" do
+        @mixpanel.append_alias "new_id"
+        mixpanel_queue_should_include(@mixpanel, "alias", "new_id")
       end
 
       it "should allow the one-time tracking of super properties in JS" do
