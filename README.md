@@ -1,6 +1,6 @@
 [![Build Status](https://secure.travis-ci.org/zevarito/mixpanel.png?branch=master)](http://travis-ci.org/zevarito/mixpanel)
 
-### If you are upgrading from a previos 4.0.0 version to 4.x.x please read deprecation notes.
+### If you are upgrading from a previous version to 4.x.x please read deprecation notes.
 
 ## Table of Contents
 
