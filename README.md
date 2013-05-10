@@ -129,7 +129,7 @@ Where **options** is a hash that accepts the following keys:
   This allows you to use a before_filter to set these variables, redirect, and still have them only transmitted
   once.
 
-  *To enable persistence*, you must set the flag twice: here when instantiating Middleware and again when you initialize
+  *To enable persistence*, you must set the flag twice: when instantiating Middleware and here when you initialize
   the Mixpanel class.
 
 * **api_key** : string
