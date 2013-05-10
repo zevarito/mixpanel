@@ -1,6 +1,9 @@
 May 2013
 --------
 
+Bump: 4.0.1 May 10, 2013
+
+* Update documentation. (Paweł Gościcki)
 * Add people.set_once to middleware script. (alvarezm50)
 
 April 2013
