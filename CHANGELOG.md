@@ -1,3 +1,8 @@
+May 2013
+--------
+
+* Add people.set_once to middleware script. (alvarezm50)
+
 April 2013
 ----------
 
