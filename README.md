@@ -334,7 +334,19 @@ you identify the user, the change will not be immediately sent to Mixpanel. Mixp
   @mixpanel.append("identify", "Unique Identifier")
 ```
 
+### Give people real names with Javascript
+
+*Note*: You should setup the [Rack Middleware](#rack-middleware).
+
+This gives names to people tracked in the `Stream` view:
+
+```ruby
+  @mixpanel.append("name_tag", "John Doe")
+```
+
+
 ### Prevent middleware from inserting code
+
 *Note*: Only applies when [Rack Middleware](#rack-middleware) is setup.
 
 Occasionally you may need to send a request for HTML that you don't want the middleware to alter. In your AJAX request include the header "SKIP_MIXPANEL_MIDDLEWARE" to prevent the mixpanel code from being inserted.
