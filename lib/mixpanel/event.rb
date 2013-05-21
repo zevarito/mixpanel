@@ -19,6 +19,14 @@ module Mixpanel::Event
     append 'track', event, track_properties(properties, false)
   end
 
+  def alias(name, properties={}, options={})
+    track_event '$create_alias', properties.merge(:alias => name), options, TRACK_URL
+  end
+
+  def append_alias(aliased_id)
+    append 'alias', aliased_id
+  end
+
   protected
 
   def track_event(event, properties, options, default_url)

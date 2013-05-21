@@ -63,10 +63,6 @@ module Mixpanel::Person
     append 'identify', distinct_id
   end
 
-  def append_alias(aliased_id)
-    append 'alias', aliased_id
-  end
-
   protected
 
   def engage(action, request_properties_or_distinct_id, properties, options)
