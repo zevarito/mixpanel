@@ -1,6 +1,8 @@
 May 2013
 --------
 
+* Allow to specify "test" when sending events using the HTTP interface(Roman Shterenzon)
+
 Bump: 4.0.2 May 23, 2013
 
 * Add alias helper method to event tracking (Chris Maddox)
