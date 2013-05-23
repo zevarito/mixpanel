@@ -44,6 +44,7 @@ module Mixpanel::Event
     url = "#{options[:url]}?data=#{encoded_data(data)}"
     url << "&api_key=#{options[:api_key]}" if options.fetch(:api_key, nil)
     url << "&img=1" if options[:img]
+    url << "&test=1" if options[:test]
     url
   end
 end
