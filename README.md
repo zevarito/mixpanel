@@ -7,7 +7,7 @@
 - [What is Mixpanel] (#what-is-mixpanel)
 - [What does this Gem do?] (#what-does-this-gem-do)
 - [Install] (#install)
-  - [Rack Middleware] (#rack-middleware) 
+  - [Rack Middleware] (#rack-middleware)
 - [Usage] (#usage)
   - [Initialize Mixpanel] (#initialize-mixpanel)
     - [Track Events Directly](#track-events-directly)
@@ -197,6 +197,12 @@ Example:
 
 ```ruby
 @mixpanel.track 'Purchased credits', { :number => 5, 'First Time Buyer' => true }
+```
+
+If you would like to alias one distinct id to another, you can use the alias helper method:
+
+```ruby
+@mixpanel.alias 'Siddhartha', { distinct_id: previous_distinct_id }
 ```
 
 ### Pixel Based Event Tracking
@@ -457,13 +463,13 @@ end
 ```ruby
 class ApplicationController < ActionController::Base
   before_filter :initialize_env
-  
+
   private
   ##
   # Initialize env for mixpanel
   def initialize_env
-    # Similar to the Resque problem above, we need to help DJ serialize the 
-    # request object. 
+    # Similar to the Resque problem above, we need to help DJ serialize the
+    # request object.
     @request_env = {
       'REMOTE_ADDR' => request.env['REMOTE_ADDR'],
       'HTTP_X_FORWARDED_FOR' => request.env['HTTP_X_FORWARDED_FOR'],
@@ -484,9 +490,9 @@ end
 ```
 **Sample Usage**
 ```ruby
-MixPanel.track("Front Page Load", { 
-                url_type: short_url.uid_type, 
-                page_name: short_url.page.name, 
+MixPanel.track("Front Page Load", {
+                url_type: short_url.uid_type,
+                page_name: short_url.page.name,
                 distinct_id: @client_uid }, @request_env)
 ```
 

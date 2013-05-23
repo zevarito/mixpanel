@@ -51,6 +51,22 @@ describe Mixpanel::Tracker do
       end
     end
 
+    describe '#alias' do
+      it 'tracks a simple event' do
+        @mixpanel.alias('James Salter').should be true
+      end
+
+      it 'tracks a $create_alias event to the TRACK_URL' do
+        @mixpanel.should_receive(:track_event).with('$create_alias', anything, {}, Mixpanel::Event::TRACK_URL)
+        @mixpanel.alias('Phillip Dean')
+      end
+
+      it 'includes the aliased name in the properties' do
+        @mixpanel.should_receive(:track_event).with('$create_alias', { :alias => 'Cristina Wheatland' }, {}, Mixpanel::Event::TRACK_URL)
+        @mixpanel.alias('Cristina Wheatland')
+      end
+    end
+
     context "Engaging people" do
       it "should set attributes" do
         @mixpanel.set('person-a', { :email => 'me@domain.com', :likeable => false }).should == true
