@@ -1,6 +1,10 @@
 May 2013
 --------
 
+Bump: 4.0.2 May 23, 2013
+
+* Add alias helper method to event tracking (Chris Maddox)
+
 Bump: 4.0.1 May 10, 2013
 
 * Update documentation. (Paweł Gościcki)
