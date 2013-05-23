@@ -193,6 +193,12 @@ it will automatically be converted to the correct form (e.g., `{ :os => 'Mac' }`
 
   This can be used to proxy Mixpanel API requests.
 
+* **test**: boolean
+
+  *Default: false*
+
+  Send data to a high priority rate limited queue to make testing easier
+
 Example:
 
 ```ruby
