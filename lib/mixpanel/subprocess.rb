@@ -1,5 +1,7 @@
-require 'open-uri'
 require 'thread'
+require "uri"
+require "net/http"
+require 'json'
 
 module Mixpanel
   class Subprocess
@@ -7,20 +9,23 @@ module Mixpanel
     ENDMARKER = Object.new
 
     Thread.abort_on_exception = true
-    producer = Thread.new do 
-      STDIN.each_line() do |url|
-        STDERR.puts("Dropped: #{url}") && next if Q.length > 10000
-        Q << url
+    producer = Thread.new do
+      STDIN.each_line() do |data|
+        STDERR.puts("Dropped: #{data}") && next if Q.length > 10000
+        Q << data
       end
       Q << ENDMARKER
     end
 
     loop do
-      url = Q.pop
-      break if(url == ENDMARKER)
-      url.chomp!
-      next if(url.empty?) #for testing
-      open(url).read
+      data = Q.pop
+      break if(data == ENDMARKER)
+      data.chomp!
+      data_hash = JSON.load(data)
+      if data_hash.is_a?(Hash) && data_hash['_mixpanel_url']
+        url = data_hash.delete('_mixpanel_url')
+        Net::HTTP.post_form(URI.parse(url), data_hash)
+      end
     end
     producer.join
   end
