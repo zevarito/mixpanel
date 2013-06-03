@@ -50,7 +50,8 @@ module Mixpanel::Event
 
   def build_data event, properties, options
     params = {}
-    params[:data] = build_event event, track_properties(properties)
+    data = build_event event, track_properties(properties)
+    params[:data] = encoded_data(data)
     params[:api_key] = options[:api_key] if options.fetch(:api_key, nil)
     params[:img] = 1 if options[:img]
     params[:test] = 1 if options[:test]

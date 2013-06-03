@@ -77,7 +77,7 @@ module Mixpanel::Person
       data = build_person action, request_properties, properties
     end
 
-    parse_response post_request(options[:url], data, options[:async])
+    parse_response post_request(options[:url], { data: encoded_data(data) }, options[:async])
   end
 
   def person_request_properties(request_properties_or_distinct_id)
