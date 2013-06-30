@@ -140,6 +140,11 @@ describe Mixpanel::Tracker do
         mixpanel_queue_should_include(@mixpanel, 'register', props)
       end
 
+      it "should allow the tracking of charges in JS" do
+        @mixpanel.append_track_charge 40
+        mixpanel_queue_should_include(@mixpanel, 'people.track_charge', 40)
+      end
+
       it "should allow alias to be called through the JS api" do
         @mixpanel.append_alias "new_id"
         mixpanel_queue_should_include(@mixpanel, "alias", "new_id")
