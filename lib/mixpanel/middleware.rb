@@ -89,7 +89,7 @@ module Mixpanel
     end
 
     def is_trackable_response?
-      return false if @status == 302
+      return false if (300..399).include?(@status.to_i)
       return false if @env.has_key?("HTTP_SKIP_MIXPANEL_MIDDLEWARE")
       is_html_response? || is_javascript_response?
     end
