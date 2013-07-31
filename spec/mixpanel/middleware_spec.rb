@@ -48,6 +48,12 @@ describe Mixpanel::Middleware do
       Nokogiri::HTML(last_response.body).search('script').size.should == 1
     end
 
+    it "should skip requests in the 3xx range" do
+      setup_rack_application(DummyApp, :body => html_document, :headers => {"Content-Type" => "text/html"}, :status => 350)
+      get "/"
+      Nokogiri::HTML(last_response.body).search('script').should be_empty
+    end
+
     context "when disabling with #skip_this_request" do
       before{ Mixpanel::Middleware.skip_this_request }
 
