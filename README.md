@@ -12,6 +12,7 @@
   - [Initialize Mixpanel] (#initialize-mixpanel)
     - [Track Events Directly](#track-events-directly)
     - [Pixel Based Event Tracking](#pixel-based-event-tracking)
+    - [Redirect Based Event Tracking](#redirect-based-event-tracking)
     - [Import Events](#import-events)
     - [Set Person Attributes Directly](#set-person-attributes-directly)
     - [Increment Person Attributes Directly](#increment-person-attributes-directly)
@@ -228,7 +229,13 @@ image_tag @mixpanel.tracking_pixel("Opened Email", { :distinct_id => "bob@email.
 
 Mixpanel docs: https://mixpanel.com/docs/api-documentation/pixel-based-event-tracking
 
+### Redirect Based Event Tracking
 
+```ruby
+@mixpanel.redirect_url "Opened Email", 'http://www.example.com/' { :distinct_id => "bob@email.com", :campaign => "Retarget" }
+```
+
+This allows to track events just when a user clicks a link. It's usually useful for tracking opened emails.
 
 ### Import Events
 

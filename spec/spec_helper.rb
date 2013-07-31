@@ -2,6 +2,7 @@ require File.join(File.dirname(__FILE__), "../lib", "mixpanel")
 require 'rack/test'
 require 'fakeweb'
 require 'nokogiri'
+require 'cgi'
 
 Dir[File.expand_path(File.join(File.dirname(__FILE__),'support','**','*.rb'))].each {|f| require f}
 

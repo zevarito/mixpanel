@@ -11,6 +11,10 @@ module Mixpanel::Event
     build_url event, properties, options.merge(:url => TRACK_URL, :img => true)
   end
 
+  def redirect_url(event, redirect, properties={}, options={})
+    build_url event, properties, options.merge(:url => TRACK_URL, :redirect => CGI::escape(redirect))
+  end
+
   def import(event, properties={}, options={})
     track_event event, properties, options, IMPORT_URL
   end
@@ -53,6 +57,7 @@ module Mixpanel::Event
     url << "&api_key=#{options[:api_key]}" if options.fetch(:api_key, nil)
     url << "&img=1" if options[:img]
     url << "&test=1" if options[:test]
+    url << "&redirect=#{options[:redirect]}" if options[:redirect]
     url
   end
 end

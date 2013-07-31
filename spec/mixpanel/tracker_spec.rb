@@ -41,6 +41,20 @@ describe Mixpanel::Tracker do
       end
     end
 
+    context "Redirect url" do
+      let(:url) { "http://example.com?foo=bar&bar=foo" }
+
+      it "should return a URL" do
+        @mixpanel.redirect_url("Click Email", url).should be_a(String)
+      end
+
+      it "should include a redirect" do
+        encoded_url = CGI::escape(url)
+        @mixpanel.redirect_url("Click Email", url).should include('&redirect=' + encoded_url)
+      end
+
+    end
+
     context "Importing events" do
       it "should import simple events" do
         @mixpanel.import('Sign up').should == true
