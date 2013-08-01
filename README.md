@@ -511,10 +511,11 @@ MixPanel.track("Front Page Load", {
 
 ## Supported Ruby Platforms
 
-- 1.8.7
+- 1.8.7 [Not supported anymore]
 - 1.9.2
 - 1.9.3
 - JRuby 1.8 Mode
+- JRuby 1.9 Mode
 
 ## Deprecation Notes
 
