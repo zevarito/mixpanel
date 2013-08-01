@@ -1,3 +1,9 @@
+July 2013
+---------
+
+* Ability to generate tracking links with redirect. (Francis Gulotta)
+* Skip Middleware injection on All Redirect statuses. (Francis Gulotta)
+
 May 2013
 --------
 
