@@ -53,7 +53,8 @@ module Mixpanel
             end
           end
         elsif is_turbolink_request? && is_html_response?
-          part.insert(part.index('</body'), render_event_tracking_scripts) unless queue.empty?
+          insert_at = part.index('</body')
+          part.insert(insert_at, render_event_tracking_scripts) unless insert_at.nil? or queue.empty?
         elsif is_ajax_request? && is_html_response?
           part.insert(0, render_event_tracking_scripts) unless queue.empty?
         elsif is_ajax_request? && is_javascript_response?

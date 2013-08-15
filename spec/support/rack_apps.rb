@@ -18,11 +18,22 @@ class DummyApp
     @response_with = {}
     @response_with[:status] = options[:status] || "200"
     @response_with[:headers] = options[:headers] || {}
-    @response_with[:body] = options[:body] || ""
+    @response_with[:body] = wrap(options[:body] || '')
   end
 
   def call(env)
-    [@response_with[:status], @response_with[:headers], [@response_with[:body]]]
+    [@response_with[:status], @response_with[:headers], @response_with[:body]]
+  end
+
+  private
+  def wrap(object)
+    if object.nil?
+      []
+    elsif object.respond_to?(:to_ary)
+      object.to_ary || [object]
+    else
+      [object]
+    end
   end
 end
 
