@@ -1,3 +1,8 @@
+August 2013
+-----------
+
+* Fix crash with chunked response and turbolinks. (Roman Shterenzon)
+
 July 2013
 ---------
 
