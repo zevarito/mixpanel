@@ -8,7 +8,6 @@ def exec_default_appends_on(mixpanel)
 end
 
 def check_for_default_appends_on(txt)
-
   txt.should =~ /mixpanel\.track\("Visit",\s?\{.*"article":1/
   txt.should =~ /mixpanel\.track\("Sign in",\s?\{.*"time":.*\}/
   txt.should =~ /mixpanel\.people\.set\(.*\);\nmixpanel.people.increment\(\"sign_in_rate\",\s?1\);/
@@ -21,7 +20,7 @@ end
 
 describe Mixpanel::Middleware do
   include Rack::Test::Methods
-  
+
   describe "Dummy apps, no text/html" do
     before do
       setup_rack_application(DummyApp, :body => html_document, :headers => {})
@@ -32,17 +31,17 @@ describe Mixpanel::Middleware do
       last_response.body.should == html_document
     end
   end
-  
+
   describe "Dummy app, handles skip requests properly" do
     before do
       setup_rack_application(DummyApp, {:body => html_document, :headers => {"Content-Type" => "text/html"}})
     end
-    
+
     it "should not append mixpanel scripts with skip request" do
       get "/", {}, {"HTTP_SKIP_MIXPANEL_MIDDLEWARE" => true}
       Nokogiri::HTML(last_response.body).search('script').should be_empty
     end
-    
+
     it "should append mixpanel scripts without skip request" do
       get "/"
       Nokogiri::HTML(last_response.body).search('script').size.should == 1
@@ -66,7 +65,7 @@ describe Mixpanel::Middleware do
 
     end
   end
-    
+
   describe "Appending async mixpanel scripts" do
     describe "With ajax requests" do
       before do
@@ -291,6 +290,21 @@ describe Mixpanel::Middleware do
 
       it "should delete events queue after use it" do
         last_request.env.has_key?("mixpanel_events").should == false
+      end
+    end
+
+    describe "With turbolinks" do
+      before do
+        setup_rack_application(DummyApp, {
+          :body => ['',html_document],
+          :headers => {'Content-Type' => 'text/html'}
+        }, {:insert_js_last => true})
+        get '/', {}, {'HTTP_X_XHR_REFERER' => '/', 'mixpanel_events' => @mixpanel.queue}
+      end
+
+      it "should append mixpanel scripts to end of body element" do
+        Nokogiri::HTML(last_response.body).search('head script').should be_empty
+        Nokogiri::HTML(last_response.body).search('body script').should_not be_empty
       end
     end
   end
