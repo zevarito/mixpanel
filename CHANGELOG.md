@@ -1,6 +1,9 @@
 August 2013
 -----------
 
+Bump: 4.0.5 Aug 26, 2013
+
+* Fix events sent async. (Eric Boehs)
 * Fix crash with chunked response and turbolinks. (Roman Shterenzon)
 
 July 2013
