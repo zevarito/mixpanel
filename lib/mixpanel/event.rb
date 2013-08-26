@@ -35,7 +35,8 @@ module Mixpanel::Event
 
   def track_event(event, properties, options, default_url)
     default = {:url => default_url, :async => @async, :api_key => @api_key}
-    url = build_url(event, properties, default.merge(options))
+    options = default.merge(options)
+    url = build_url(event, properties, options)
     parse_response request(url, options[:async])
   end
 
