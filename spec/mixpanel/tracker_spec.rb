@@ -127,14 +127,18 @@ describe Mixpanel::Tracker do
       end
 
       it "should append simple events" do
-        props = { :time => Time.now, :ip => 'ASDF' }
+        time = Time.now
+        props = { :time => time, :ip => 'ASDF' }
         @mixpanel.append_track "Sign up", props
+        props[:time] = time.to_i
         mixpanel_queue_should_include(@mixpanel, "track", "Sign up", props)
       end
 
       it "should append events with properties" do
-        props = { :referer => 'http://example.com', :time => Time.now, :ip => 'ASDF' }
+        time = Time.now
+        props = { :referer => 'http://example.com', :time => time, :ip => 'ASDF' }
         @mixpanel.append_track "Sign up", props
+        props[:time] = time.to_i
         mixpanel_queue_should_include(@mixpanel, "track", "Sign up", props)
       end
 
