@@ -194,4 +194,21 @@ describe Mixpanel::Tracker do
       w2.should_not == w
     end
   end
+
+  describe '#properties_hash' do
+    it "base64encodes json formatted data" do
+      properties = { a: 4, b: "foo"}
+      special_properties = ["a"]
+      hash = @mixpanel.send(:properties_hash, properties, special_properties)
+      hash.should eq({ :'$a' => 4, :b => "foo"})
+    end
+
+    it "converts Time objects into integers" do
+      time = Time.new
+      properties = { a: time, b: "foo"}
+      special_properties = []
+      hash = @mixpanel.send(:properties_hash, properties, special_properties)
+      hash.should eq({ a: time.to_i, b: "foo"})
+    end
+  end
 end
