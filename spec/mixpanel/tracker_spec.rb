@@ -127,14 +127,18 @@ describe Mixpanel::Tracker do
       end
 
       it "should append simple events" do
-        props = { :time => Time.now, :ip => 'ASDF' }
+        time = Time.now
+        props = { :time => time, :ip => 'ASDF' }
         @mixpanel.append_track "Sign up", props
+        props[:time] = time.to_i
         mixpanel_queue_should_include(@mixpanel, "track", "Sign up", props)
       end
 
       it "should append events with properties" do
-        props = { :referer => 'http://example.com', :time => Time.now, :ip => 'ASDF' }
+        time = Time.now
+        props = { :referer => 'http://example.com', :time => time, :ip => 'ASDF' }
         @mixpanel.append_track "Sign up", props
+        props[:time] = time.to_i
         mixpanel_queue_should_include(@mixpanel, "track", "Sign up", props)
       end
 
@@ -192,6 +196,23 @@ describe Mixpanel::Tracker do
       w.closed?.should == true
       w2 = Mixpanel::Tracker.worker
       w2.should_not == w
+    end
+  end
+
+  describe '#properties_hash' do
+    it "base64encodes json formatted data" do
+      properties = { :a => 4, :b => "foo"}
+      special_properties = ["a"]
+      hash = @mixpanel.send(:properties_hash, properties, special_properties)
+      hash.should eq({ :'$a' => 4, :b => "foo"})
+    end
+
+    it "converts Time objects into integers" do
+      time = Time.new
+      properties = { :a => time, :b => "foo"}
+      special_properties = []
+      hash = @mixpanel.send(:properties_hash, properties, special_properties)
+      hash.should eq({ :a => time.to_i, :b => "foo"})
     end
   end
 end

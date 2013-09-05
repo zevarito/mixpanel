@@ -8,12 +8,12 @@ Dir[File.expand_path(File.join(File.dirname(__FILE__),'support','**','*.rb'))].e
 
 MIX_PANEL_TOKEN = "e2d8b0bea559147844ffab3d607d26a6"
 
-
+# json hashes have string keys, convert to json and back to compare hashes
 def mixpanel_queue_should_include(mixpanel, type, *arguments)
-  mixpanel.queue.each do |event_type, event_arguments|
-    # hashes store keys in an undetermined order.  convert to json and back and compare hash to hash, not json to json
-    unjsonify(event_arguments).should == json_and_back(arguments)
-  end
+  event = mixpanel.queue.detect { |event| event[0] == type }
+  event.should_not be_nil
+  event_arguments = event[1]
+  unjsonify(event_arguments).should == json_and_back(arguments)
 end
 
 def json_and_back array
