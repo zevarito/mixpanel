@@ -1,3 +1,9 @@
+September 2013
+--------------
+
+* Add append_track_charge method to person.rb (Matt Angriffel)
+* Convert time property to timestamp (Francis Gulotta)
+
 August 2013
 -----------
 
