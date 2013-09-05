@@ -51,8 +51,8 @@ module Mixpanel::Person
     append 'people.increment', property, increment
   end
 
-  def append_track_charge(amount, properties={})
-    append 'people.track_charge', amount, properties={}
+  def append_track_charge(amount)
+    append 'people.track_charge', amount
   end
 
   def append_register(properties={})
