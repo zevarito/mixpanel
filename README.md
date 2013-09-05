@@ -514,6 +514,7 @@ MixPanel.track("Front Page Load", {
 - 1.8.7 [Not supported anymore]
 - 1.9.2
 - 1.9.3
+- 2.0.0
 - JRuby 1.8 Mode
 - JRuby 1.9 Mode
 
