@@ -51,6 +51,10 @@ module Mixpanel::Person
     append 'people.increment', property, increment
   end
 
+  def append_track_charge(amount)
+    append 'people.track_charge', amount
+  end
+
   def append_register(properties={})
     append 'register', properties_hash(properties, PERSON_PROPERTIES)
   end
