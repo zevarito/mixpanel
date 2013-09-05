@@ -249,7 +249,7 @@ default url is `http://api.mixpanel.com/import/`
 Example:
 
 ```ruby
-@mixpanel.import 'Purchased credits', { :number => 4, :time => 5.weeks.ago }, { :api_key => MY_API_KEY}
+@mixpanel.import 'Purchased credits', { :number => 4, :time => 5.weeks.ago.to_i }, { :api_key => MY_API_KEY}
 ```
 
 ### Set Person Attributes Directly
@@ -405,7 +405,7 @@ Then you can call against this method where it makes sense in your controller.  
     mixpanel.track 'User Created', {
       :gender => @user.gender,
       :distinct_id => @user.mixpanel_identifier,
-      :time => @user.created_at
+      :time => @user.created_at.to_i
     } # Note that passing the time key overwrites the default value of Time.now
 
     mixpanel.set @user.mixpanel_identifer, { :gender => @user.gender, :created => @user.created_at, :name => @user.name }
