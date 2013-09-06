@@ -188,7 +188,7 @@ describe Mixpanel::Tracker do
       #On most systems this will exceed the pipe buffer size
       8.times do
         9000.times do
-          w.write("\n")
+          w.write("")
         end
         sleep 0.1
       end
