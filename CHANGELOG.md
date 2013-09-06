@@ -1,6 +1,12 @@
 September 2013
 --------------
 
+Bump: 4.0.7 Sep 6, 2013
+
+* Fix request doing GET instead POST (Jan Berdajs)
+
+Bump: 4.0.6 Sep 5, 2013
+
 * Add append_track_charge method to person.rb (Matt Angriffel)
 * Convert time property to timestamp (Francis Gulotta)
 
