@@ -1,7 +1,8 @@
-require "open-uri"
-require 'base64'
+require "uri"
+require "net/http"
 require 'json'
 require 'thread'
+require 'base64'
 
 module Mixpanel
   class Tracker
@@ -58,19 +59,23 @@ module Mixpanel
       Base64.encode64(JSON.generate(parameters)).gsub(/\n/,'')
     end
 
-    def request(url, async)
-      async ? send_async(url) : open(url).read
+    def post_request(url, data, async)
+      if async
+        send_async(url, data)
+      else
+        Net::HTTP.post_form(URI.parse(url), data)
+      end
     end
 
     def parse_response(response)
-      response.to_i == 1
+      response.body.to_i == 1
     end
 
-    def send_async(url)
+    def send_async(url, data)
       w = Mixpanel::Tracker.worker
       begin
         url << "\n"
-        w.write url
+        w.write JSON.dump(data.merge(_mixpanel_url: url))
         1
       rescue Errno::EPIPE => e
         Mixpanel::Tracker.dispose_worker w

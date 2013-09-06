@@ -36,8 +36,8 @@ module Mixpanel::Event
   def track_event(event, properties, options, default_url)
     default = {:url => default_url, :async => @async, :api_key => @api_key}
     options = default.merge(options)
-    url = build_url(event, properties, options)
-    parse_response request(url, options[:async])
+    data = build_data(event, properties, options)
+    parse_response post_request(options[:url], data, options[:async])
   end
 
   def track_properties(properties, include_token=true)
@@ -50,6 +50,16 @@ module Mixpanel::Event
 
   def build_event(event, properties)
     { :event => event, :properties => properties_hash(properties, EVENT_PROPERTIES) }
+  end
+
+  def build_data event, properties, options
+    params = {}
+    data = build_event event, track_properties(properties)
+    params[:data] = encoded_data(data)
+    params[:api_key] = options[:api_key] if options.fetch(:api_key, nil)
+    params[:img] = 1 if options[:img]
+    params[:test] = 1 if options[:test]
+    params
   end
 
   def build_url event, properties, options
