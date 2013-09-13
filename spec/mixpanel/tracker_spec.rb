@@ -29,6 +29,10 @@ describe Mixpanel::Tracker do
       it "should track events with properties" do
         @mixpanel.track('Sign up', { :likeable => true }, { :api_key => 'asdf' }).should == true
       end
+
+      it "should track simple events with async" do
+        @mixpanel.track("Sign up", {}, :async => true).should == true
+      end
     end
 
     context "Tracking pixel" do
