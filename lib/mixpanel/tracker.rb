@@ -68,7 +68,11 @@ module Mixpanel
     end
 
     def parse_response(response)
-      response.body.to_i == 1
+      if response.respond_to?(:body)
+        response.body.to_i == 1
+      else
+        response.to_i == 1
+      end
     end
 
     def send_async(url, data)
