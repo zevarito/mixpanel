@@ -1,6 +1,10 @@
-[![Build Status](https://secure.travis-ci.org/zevarito/mixpanel.png?branch=master)](http://travis-ci.org/zevarito/mixpanel)
+# Important News
 
-### If you are upgrading from a previous version to 4.x.x please read deprecation notes.
+This Gem will not be maintained anymore, there is an Official gem being developed and we encourage you to use that gem from now on.
+
+We will merge PR for bugs for a little period of time, but no new features will be added.
+
+[Official Gem repository](https://github.com/mixpanel/mixpanel-ruby)
 
 ## Table of Contents
 
