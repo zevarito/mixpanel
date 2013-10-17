@@ -78,8 +78,9 @@ module Mixpanel
     def send_async(url, data)
       w = Mixpanel::Tracker.worker
       begin
-        url << "\n"
-        w.write JSON.dump(data.merge(_mixpanel_url: url))
+        raw_data = JSON.dump(data.merge(_mixpanel_url: url))
+        w.write raw_data
+        w.write "\n" unless raw_data.end_with?("\n")
         1
       rescue Errno::EPIPE => e
         Mixpanel::Tracker.dispose_worker w
