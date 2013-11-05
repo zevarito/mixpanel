@@ -24,7 +24,7 @@ module Mixpanel
       data_hash = JSON.load(data)
       if data_hash.is_a?(Hash) && data_hash['_mixpanel_url']
         url = data_hash.delete('_mixpanel_url')
-        Net::HTTP.post_form(URI.parse(url), data_hash)
+        Net::HTTP.post_form(::URI.parse(url), data_hash)
       end
     end
     producer.join
