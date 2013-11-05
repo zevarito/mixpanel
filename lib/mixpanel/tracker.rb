@@ -63,7 +63,7 @@ module Mixpanel
       if async
         send_async(url, data)
       else
-        Net::HTTP.post_form(::URI.parse(url), data)
+        Net::HTTP.post_form(URI.parse(url), data)
       end
     end
 
