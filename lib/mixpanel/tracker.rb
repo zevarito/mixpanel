@@ -63,7 +63,7 @@ module Mixpanel
       if async
         send_async(url, data)
       else
-        Net::HTTP.post_form(URI.parse(url), data)
+        Net::HTTP.post_form(::URI.parse(url), data)
       end
     end
 
@@ -79,7 +79,7 @@ module Mixpanel
       w = Mixpanel::Tracker.worker
       begin
         url << "\n"
-        w.write JSON.dump(data.merge(_mixpanel_url: url))
+        w.write JSON.dump(data.merge(:_mixpanel_url => url))
         1
       rescue Errno::EPIPE => e
         Mixpanel::Tracker.dispose_worker w
