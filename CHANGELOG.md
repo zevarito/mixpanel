@@ -1,3 +1,10 @@
+November 2013
+--------------
+
+Bump: 4.0.9 Nov 7, 2013
+
+* URI namespace fix (Ahmed Belal)
+
 September 2013
 --------------
 
