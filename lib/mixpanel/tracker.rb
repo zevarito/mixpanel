@@ -4,6 +4,10 @@ require 'json'
 require 'thread'
 require 'base64'
 
+require 'active_support/concern'
+require 'action_view/helpers/capture_helper'
+require 'action_view/helpers/javascript_helper'
+
 module Mixpanel
   class Tracker
     require 'mixpanel/async'
@@ -13,6 +17,8 @@ module Mixpanel
     extend Mixpanel::Async
     include Mixpanel::Event
     include Mixpanel::Person
+
+    include ActionView::Helpers::JavaScriptHelper
 
     def initialize(token, options={})
       @token = token
@@ -35,7 +41,10 @@ module Mixpanel
     end
 
     def append(type, *args)
-      queue << [type, args.collect {|arg| arg.to_json}]
+      js_args = args.collect do |arg|
+        escape_object_for_js(arg).to_json
+      end
+      queue << [type, js_args]
     end
 
     protected
@@ -84,6 +93,45 @@ module Mixpanel
       rescue Errno::EPIPE => e
         Mixpanel::Tracker.dispose_worker w
         0
+      end
+    end
+
+    private
+
+    # Recursively escape anything in a primitive, array, or hash, in
+    # preparation for jsonifying it
+    def escape_object_for_js(object, i = 0)
+
+      if object.kind_of? Hash
+        # Recursive case
+        Hash.new.tap do |h|
+          object.each do |k, v|
+            h[escape_object_for_js(k, i + 1)] = escape_object_for_js(v, i + 1)
+          end
+        end
+
+      elsif object.kind_of? Enumerable
+        # Recursive case
+        object.map do |elt|
+          escape_object_for_js(elt, i + 1)
+        end
+
+      elsif object.respond_to? :iso8601
+        # Base case - safe object
+        object.iso8601
+
+      elsif object.kind_of?(Numeric)
+        # Base case - safe object
+        object
+
+      elsif [true, false, nil].member?(object)
+        # Base case - safe object
+        object
+
+      else
+        # Base case - use string sanitizer from ActiveSupport
+        escape_javascript(object.to_s)
+
       end
     end
   end
