@@ -4,10 +4,6 @@ require 'json'
 require 'thread'
 require 'base64'
 
-require 'active_support/concern'
-require 'action_view/helpers/capture_helper'
-require 'action_view/helpers/javascript_helper'
-
 module Mixpanel
   class Tracker
     require 'mixpanel/async'
@@ -17,8 +13,6 @@ module Mixpanel
     extend Mixpanel::Async
     include Mixpanel::Event
     include Mixpanel::Person
-
-    include ActionView::Helpers::JavaScriptHelper
 
     def initialize(token, options={})
       @token = token
@@ -132,6 +126,35 @@ module Mixpanel
         # Base case - use string sanitizer from ActiveSupport
         escape_javascript(object.to_s)
 
+      end
+    end
+
+    # All this code borrowed from rails/action_pack - ActionView::Helpers::JavascriptHelper
+
+    JS_ESCAPE_MAP = {
+                     '\\'    => '\\\\',
+                     '</'    => '<\/',
+                     "\r\n"  => '\n',
+                     "\n"    => '\n',
+                     "\r"    => '\n',
+                     '"'     => '\\"',
+                     "'"     => "\\'"
+                    }
+
+    JS_ESCAPE_MAP["\342\200\250".force_encoding(Encoding::UTF_8).encode!] = '&#x2028;'
+    JS_ESCAPE_MAP["\342\200\251".force_encoding(Encoding::UTF_8).encode!] = '&#x2029;'
+
+    # Escapes carriage returns and single and double quotes for JavaScript segments.
+    #
+    # Also available through the alias j(). This is particularly helpful in JavaScript
+    # responses, like:
+    #
+    #   $('some_element').replaceWith('<%=j render 'some/element_template' %>');
+    def escape_javascript(javascript)
+      if javascript
+        javascript.gsub(/(\\|<\/|\r\n|\342\200\250|\342\200\251|[\n\r"'])/u) {|match| JS_ESCAPE_MAP[match] }
+      else
+        ''
       end
     end
   end
