@@ -4,9 +4,11 @@ This Gem will not be maintained anymore, there is an Official gem being develope
 
 We will merge PR for bugs for a little period of time, but no new features will be added.
 
-# Upgrade to 4.1.0 to avoid XSS Vulnerability
-
 [Official Gem repository](https://github.com/mixpanel/mixpanel-ruby)
+
+# Needed updates
+
+Upgrade to version 4.1.0 to avoid XSS Vulnerability
 
 ## Table of Contents
 
