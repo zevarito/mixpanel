@@ -1,6 +1,10 @@
 November 2013
 --------------
 
+* Bump: 4.1.0 Nov 14, 2013
+
+* Fix XSS Vulnerability (bradleybuda)
+
 Bump: 4.0.9 Nov 7, 2013
 
 * URI namespace fix (Ahmed Belal)
