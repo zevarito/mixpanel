@@ -35,7 +35,10 @@ module Mixpanel
     end
 
     def append(type, *args)
-      queue << [type, args.collect {|arg| arg.to_json}]
+      js_args = args.collect do |arg|
+        escape_object_for_js(arg).to_json
+      end
+      queue << [type, js_args]
     end
 
     protected
@@ -84,6 +87,74 @@ module Mixpanel
       rescue Errno::EPIPE => e
         Mixpanel::Tracker.dispose_worker w
         0
+      end
+    end
+
+    private
+
+    # Recursively escape anything in a primitive, array, or hash, in
+    # preparation for jsonifying it
+    def escape_object_for_js(object, i = 0)
+
+      if object.kind_of? Hash
+        # Recursive case
+        Hash.new.tap do |h|
+          object.each do |k, v|
+            h[escape_object_for_js(k, i + 1)] = escape_object_for_js(v, i + 1)
+          end
+        end
+
+      elsif object.kind_of? Enumerable
+        # Recursive case
+        object.map do |elt|
+          escape_object_for_js(elt, i + 1)
+        end
+
+      elsif object.respond_to? :iso8601
+        # Base case - safe object
+        object.iso8601
+
+      elsif object.kind_of?(Numeric)
+        # Base case - safe object
+        object
+
+      elsif [true, false, nil].member?(object)
+        # Base case - safe object
+        object
+
+      else
+        # Base case - use string sanitizer from ActiveSupport
+        escape_javascript(object.to_s)
+
+      end
+    end
+
+    # All this code borrowed from rails/action_pack - ActionView::Helpers::JavascriptHelper
+
+    JS_ESCAPE_MAP = {
+                     '\\'    => '\\\\',
+                     '</'    => '<\/',
+                     "\r\n"  => '\n',
+                     "\n"    => '\n',
+                     "\r"    => '\n',
+                     '"'     => '\\"',
+                     "'"     => "\\'"
+                    }
+
+    JS_ESCAPE_MAP["\342\200\250".force_encoding(Encoding::UTF_8).encode!] = '&#x2028;'
+    JS_ESCAPE_MAP["\342\200\251".force_encoding(Encoding::UTF_8).encode!] = '&#x2029;'
+
+    # Escapes carriage returns and single and double quotes for JavaScript segments.
+    #
+    # Also available through the alias j(). This is particularly helpful in JavaScript
+    # responses, like:
+    #
+    #   $('some_element').replaceWith('<%=j render 'some/element_template' %>');
+    def escape_javascript(javascript)
+      if javascript
+        javascript.gsub(/(\\|<\/|\r\n|\342\200\250|\342\200\251|[\n\r"'])/u) {|match| JS_ESCAPE_MAP[match] }
+      else
+        ''
       end
     end
   end

@@ -146,6 +146,24 @@ describe Mixpanel::Tracker do
         mixpanel_queue_should_include(@mixpanel, "track", "Sign up", props)
       end
 
+      it "should sanitize property values" do
+        @mixpanel.append_track("Sign up", {:referer => "</script><script>alert('XSS');</script>"})
+        @mixpanel.queue.size.should == 1
+        enqueued = @mixpanel.queue.first
+        properties_json = enqueued[1][1]
+        properties_json.should_not match(%r|</script>|)
+      end
+
+      it "should be able to sanitize complex objects" do
+        properties = {'object' => ['foo', {2 => 1, 1 => ['bar', Time.now, nil, {'xss' => "</script><script>alert('XSS');</script>"}]}]}
+        @mixpanel.append_track("Sign up", properties)
+        @mixpanel.queue.size.should == 1
+        enqueued = @mixpanel.queue.first
+        properties_json = enqueued[1][1]
+        properties_json.should_not match(%r|</script>|)
+      end
+
+
       it "should give direct access to queue" do
         @mixpanel.append_track("Sign up", {:referer => 'http://example.com'})
         @mixpanel.queue.size.should == 1
