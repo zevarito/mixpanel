@@ -9,10 +9,12 @@ module Mixpanel
     require 'mixpanel/async'
     require 'mixpanel/event'
     require 'mixpanel/person'
+    require 'mixpanel/http'
 
     extend Mixpanel::Async
     include Mixpanel::Event
     include Mixpanel::Person
+    include Mixpanel::Http
 
     def initialize(token, options={})
       @token = token
@@ -66,7 +68,7 @@ module Mixpanel
       if async
         send_async(url, data)
       else
-        Net::HTTP.post_form(::URI.parse(url), data)
+        http_client.post(url, data)
       end
     end
 
