@@ -11,7 +11,7 @@ module Mixpanel
         req.basic_auth uri.user, uri.password if uri.user
         ssl = uri.scheme == 'https' 
 
-        Net::HTTP.start(uri.hostname, uri.port, :use_ssl => ssl) do |http|
+        Net::HTTP.start(uri.host, uri.port, :use_ssl => ssl) do |http|
           http.request(req)
         end
       end
