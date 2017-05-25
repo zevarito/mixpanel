@@ -59,7 +59,7 @@ module Mixpanel
     end
 
     def encoded_data(parameters)
-      Base64.encode64(JSON.generate(parameters)).gsub(/\n/,'')
+      Base64.strict_encode64 parameters.to_json
     end
 
     def post_request(url, data, async)
