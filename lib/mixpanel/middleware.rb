@@ -150,7 +150,15 @@ module Mixpanel
       output = queue.map {|type, arguments| %(mixpanel.#{type}(#{arguments.join(', ')});) }.join("\n")
       output = "try {#{output}} catch(err) {};"
 
-      include_script_tag ? "<script type='text/javascript'>#{output}</script>" : output
+      request = ActionDispatch::Request.new @env
+
+      if include_script_tag && request.content_security_policy_nonce.present?
+        "<script type='text/javascript' nonce='#{request.content_security_policy_nonce}'>#{output}</script>"
+      elsif include_script_tag
+        "<script type='text/javascript'>#{output}</script>"
+      else
+        output
+      end
     end
   end
 end
