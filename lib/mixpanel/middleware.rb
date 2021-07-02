@@ -151,7 +151,14 @@ module Mixpanel
       output = "try {#{output}} catch(err) {};"
 
       request = ActionDispatch::Request.new @env
-      include_script_tag ? "<script type='text/javascript' nonce='#{request.content_security_policy_nonce}'>#{output}</script>" : output
+
+      if include_script_tag && request.content_security_policy_nonce.present?
+        "<script type='text/javascript' nonce='#{request.content_security_policy_nonce}'>#{output}</script>"
+      elsif include_script_tag
+        "<script type='text/javascript'>#{output}</script>"
+      else
+        output
+      end
     end
   end
 end
