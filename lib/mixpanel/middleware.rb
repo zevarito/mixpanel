@@ -53,7 +53,7 @@ module Mixpanel
           unless insert_at.nil?
             part.insert(insert_at, render_event_tracking_scripts) unless queue.empty?
             if @options[:insert_mixpanel_scripts]
-              part.insert(insert_at, render_mixpanel_scripts) #This will insert the mixpanel initialization code before the queue of tracking events.
+              part.insert(insert_at, render_mixpanel_scripts.html_safe) #This will insert the mixpanel initialization code before the queue of tracking events.
             end
           end
         elsif is_turbolink_request? && is_html_response?
@@ -153,11 +153,11 @@ module Mixpanel
       request = ActionDispatch::Request.new @env
 
       if include_script_tag && request.content_security_policy_nonce.present?
-        "<script type='text/javascript' nonce='#{request.content_security_policy_nonce}'>#{output}</script>"
+        "<script type='text/javascript' nonce='#{request.content_security_policy_nonce}'>#{output}</script>".html_safe
       elsif include_script_tag
-        "<script type='text/javascript'>#{output}</script>"
+        "<script type='text/javascript'>#{output}</script>".html_safe
       else
-        output
+        output.html_safe
       end
     end
   end
